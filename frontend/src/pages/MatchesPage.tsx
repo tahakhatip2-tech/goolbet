@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Button } from '../components/ui/Button';
 import { BetSlip } from '../components/BetSlip';
 import { getMatches } from '../api/matches';
 import { BackendImage } from '../components/BackendImage';
 import { HeroSection } from '../components/ui/HeroSection';
-import { Trophy, ShieldHalf, CalendarDays, Clock, Activity, MessageCircle, Zap, Shield, Star, LockKeyhole } from 'lucide-react';
+import { Trophy, ShieldHalf, CalendarDays, Clock, Activity, MessageCircle, Zap, Shield, Star, LockKeyhole, Tv } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
 
@@ -15,6 +16,7 @@ export const MatchesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'ALL' | 'LIVE' | 'UPCOMING'>('ALL');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -230,6 +232,20 @@ export const MatchesPage: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Watch Live Button */}
+              {match.isStreamActive && (
+                <div className="px-2 pb-1">
+                  <button
+                    onClick={() => navigate(`/watch/${match.id}`)}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-bold text-xs shadow-lg shadow-red-500/30 transition-all duration-200 animate-pulse hover:animate-none"
+                  >
+                    <span className="w-2 h-2 bg-white rounded-full animate-ping" />
+                    <Tv size={14} />
+                    شاهد مباشرة
+                  </button>
+                </div>
+              )}
 
               {/* Betting Odds Area */}
               <div className="p-2 border-t border-slate-200 bg-white/60 backdrop-blur-md">

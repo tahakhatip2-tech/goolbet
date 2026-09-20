@@ -80,7 +80,7 @@ export const getAllBets = async (req: Request, res: Response) => {
 // Create a Match
 export const createMatch = async (req: Request, res: Response) => {
   try {
-    let { team1Name, team1Logo, team2Name, team2Logo, league, matchDate, status, description, odds, team1Score, team2Score } = req.body;
+    let { team1Name, team1Logo, team2Name, team2Logo, league, matchDate, status, description, odds, team1Score, team2Score, streamUrl, isStreamActive } = req.body;
     
     // Parse odds if sent as a JSON string from form-data
     if (typeof odds === 'string') {
@@ -120,6 +120,8 @@ export const createMatch = async (req: Request, res: Response) => {
         matchDate: new Date(matchDate as string),
         status: status as MatchStatus,
         description: description as string | undefined,
+        streamUrl: streamUrl as string | undefined,
+        isStreamActive: isStreamActive === true || isStreamActive === 'true',
         odds: {
           create: {
             team1Win: odds?.team1Win || 1.0,
@@ -141,7 +143,7 @@ export const createMatch = async (req: Request, res: Response) => {
 export const updateMatch = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    let { team1Name, team1Logo, team2Name, team2Logo, league, matchDate, status, description, odds, team1Score, team2Score } = req.body;
+    let { team1Name, team1Logo, team2Name, team2Logo, league, matchDate, status, description, odds, team1Score, team2Score, streamUrl, isStreamActive } = req.body;
 
     // Parse odds if sent as a JSON string from form-data
     if (typeof odds === 'string') {
@@ -186,6 +188,8 @@ export const updateMatch = async (req: Request, res: Response) => {
         matchDate: new Date(matchDate as string),
         status: status as MatchStatus,
         description: description as string | undefined,
+        streamUrl: streamUrl as string | undefined,
+        isStreamActive: isStreamActive !== undefined ? (isStreamActive === true || isStreamActive === 'true') : undefined,
         odds: {
           updateMany: {
             where: { matchId: id },
@@ -445,6 +449,37 @@ export const getPendingTransactions = async (req: Request, res: Response) => {
     res.json(transactions);
   } catch (error) {
     res.status(500).json({ error: 'Server error fetching transactions' });
+  }
+};
+
+// Get Global Transaction Stats for Dashboard
+export const getTransactionStats = async (req: Request, res: Response) => {
+  try {
+    const totalTransactions = await prisma.walletTransaction.count();
+    const depositCount = await prisma.walletTransaction.count({ where: { type: 'DEPOSIT' } });
+    const withdrawCount = await prisma.walletTransaction.count({ where: { type: 'WITHDRAWAL' } });
+    
+    const depositAgg = await prisma.walletTransaction.aggregate({
+      _sum: { amount: true },
+      where: { type: 'DEPOSIT', status: 'COMPLETED' }
+    });
+    
+    const withdrawAgg = await prisma.walletTransaction.aggregate({
+      _sum: { amount: true },
+      where: { type: 'WITHDRAWAL', status: 'COMPLETED' }
+    });
+
+    const totalAmount = (depositAgg._sum.amount || 0) + Math.abs(withdrawAgg._sum.amount || 0);
+
+    res.json({
+      totalCount: totalTransactions,
+      depositCount,
+      withdrawCount,
+      totalAmount
+    });
+  } catch (error) {
+    console.error('Error fetching transaction stats:', error);
+    res.status(500).json({ error: 'Server error fetching transaction stats' });
   }
 };
 
@@ -708,5 +743,29 @@ export const manageWallet = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error managing wallet:', error);
     res.status(500).json({ error: 'خطأ في الخادم أثناء تعديل الرصيد' });
+  }
+};
+
+// Toggle Stream Active Status
+export const toggleStream = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { isStreamActive, streamUrl } = req.body;
+
+    const match = await prisma.match.findUnique({ where: { id } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+
+    const updated = await prisma.match.update({
+      where: { id },
+      data: {
+        isStreamActive: isStreamActive !== undefined ? Boolean(isStreamActive) : !match.isStreamActive,
+        ...(streamUrl !== undefined ? { streamUrl } : {})
+      }
+    });
+
+    res.json({ message: 'Stream status updated', match: updated });
+  } catch (error) {
+    console.error('Error toggling stream:', error);
+    res.status(500).json({ error: 'Server error toggling stream' });
   }
 };

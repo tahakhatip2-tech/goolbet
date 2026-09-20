@@ -8,6 +8,7 @@ import betRoutes from './routes/betRoutes';
 import adminRoutes from './routes/adminRoutes';
 import walletRoutes from './routes/walletRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import chatRoutes from './routes/chatRoutes';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/bets', betRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'API is running', env: process.env.NODE_ENV });

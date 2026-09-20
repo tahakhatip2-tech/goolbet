@@ -129,25 +129,30 @@ import { useToast } from '../../context/ToastContext';
 
 export const AdminTransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalCount: 0, depositCount: 0, withdrawCount: 0, totalAmount: 0 });
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'ALL' | 'DEPOSIT' | 'WITHDRAWAL'>('ALL');
   const { toast } = useToast();
 
-  const fetchTransactions = async () => {
+  const fetchData = async () => {
     try {
-      const res = await api.get('/admin/transactions');
-      setTransactions(res.data);
+      const [txRes, statsRes] = await Promise.all([
+        api.get('/admin/transactions'),
+        api.get('/admin/transactions/stats')
+      ]);
+      setTransactions(txRes.data);
+      setStats(statsRes.data);
     } catch (error) {
-      console.error('Error fetching transactions', error);
-      toast.error('حدث خطأ أثناء جلب المعاملات');
+      console.error('Error fetching data', error);
+      toast.error('حدث خطأ أثناء جلب البيانات');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTransactions();
+    fetchData();
   }, []);
 
   const handleProcess = async (id: string, action: 'APPROVE' | 'REJECT') => {
@@ -155,7 +160,7 @@ export const AdminTransactionsPage: React.FC = () => {
     setProcessingId(id);
     try {
       await api.put(`/admin/transactions/${id}/process`, { action });
-      fetchTransactions();
+      fetchData(); // re-fetch both pending tx and stats
       toast.success(action === 'APPROVE' ? 'تمت الموافقة على المعاملة بنجاح' : 'تم رفض المعاملة بنجاح');
     } catch (error) {
       toast.error('حدث خطأ أثناء معالجة المعاملة');
@@ -165,9 +170,6 @@ export const AdminTransactionsPage: React.FC = () => {
   };
 
   const filtered = filter === 'ALL' ? transactions : transactions.filter(tx => tx.type === filter);
-  const depositCount = transactions.filter(tx => tx.type === 'DEPOSIT').length;
-  const withdrawCount = transactions.filter(tx => tx.type === 'WITHDRAWAL').length;
-  const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);
 
   if (loading) return (
     <div className="flex justify-center items-center h-[60vh]">
@@ -191,22 +193,22 @@ export const AdminTransactionsPage: React.FC = () => {
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <Clock size={20} className="text-blue-500 mb-1" />
             <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">الكل</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">{transactions.length}</span>
+            <span className="text-lg md:text-xl font-black text-slate-900">{stats.totalCount}</span>
           </div>
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <TrendingUp size={20} className="text-emerald-500 mb-1" />
             <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">إيداع</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">{depositCount}</span>
+            <span className="text-lg md:text-xl font-black text-slate-900">{stats.depositCount}</span>
           </div>
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <TrendingDown size={20} className="text-rose-500 mb-1" />
             <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">سحب</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">{withdrawCount}</span>
+            <span className="text-lg md:text-xl font-black text-slate-900">{stats.withdrawCount}</span>
           </div>
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <Receipt size={20} className="text-purple-500 mb-1" />
             <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">الإجمالي</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">${totalAmount.toFixed(0)}</span>
+            <span className="text-lg md:text-xl font-black text-slate-900">${stats.totalAmount.toFixed(0)}</span>
           </div>
         </div>
       </HeroSection>

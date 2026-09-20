@@ -18,7 +18,9 @@ export const AdminMatchesPage: React.FC = () => {
   const [formData, setFormData] = useState({
     team1Name: '', team2Name: '', league: '', matchDate: '', status: 'UPCOMING',
     team1Score: 0, team2Score: 0,
-    odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 }
+    odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 },
+    streamUrl: '',
+    isStreamActive: false
   });
   const [team1LogoFile, setTeam1LogoFile] = useState<File | null>(null);
   const [team2LogoFile, setTeam2LogoFile] = useState<File | null>(null);
@@ -65,6 +67,8 @@ export const AdminMatchesPage: React.FC = () => {
       data.append('team1Score', formData.team1Score.toString());
       data.append('team2Score', formData.team2Score.toString());
       data.append('odds', JSON.stringify(formData.odds));
+      if (formData.streamUrl) data.append('streamUrl', formData.streamUrl);
+      data.append('isStreamActive', String(formData.isStreamActive));
       
       if (team1LogoFile) data.append('team1Logo', team1LogoFile);
       if (team2LogoFile) data.append('team2Logo', team2LogoFile);
@@ -106,7 +110,9 @@ export const AdminMatchesPage: React.FC = () => {
         team1Win: match.odds[0]?.team1Win || 1.5,
         draw: match.odds[0]?.draw || 3.0,
         team2Win: match.odds[0]?.team2Win || 2.5,
-      }
+      },
+      streamUrl: match.streamUrl || '',
+      isStreamActive: match.isStreamActive || false
     });
     setTeam1LogoFile(null);
     setTeam2LogoFile(null);
@@ -122,7 +128,9 @@ export const AdminMatchesPage: React.FC = () => {
       team1Name: '', team2Name: '',
       league: '', matchDate: '', status: 'UPCOMING',
       team1Score: 0, team2Score: 0,
-      odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 }
+      odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 },
+      streamUrl: '',
+      isStreamActive: false
     });
     setTeam1LogoFile(null);
     setTeam2LogoFile(null);
@@ -176,6 +184,18 @@ export const AdminMatchesPage: React.FC = () => {
       toast.success('تم حذف المباراة بنجاح.');
     } catch (error) {
       toast.error('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const handleToggleStream = async (match: any) => {
+    try {
+      await api.put(`/admin/matches/${match.id}/stream`, {
+        isStreamActive: !match.isStreamActive
+      });
+      fetchMatches();
+      toast.success(!match.isStreamActive ? '✅ تم تفعيل البث المباشر' : '⏹️ تم إيقاف البث');
+    } catch (error) {
+      toast.error('حدث خطأ أثناء تغيير حالة البث');
     }
   };
 
@@ -344,6 +364,35 @@ export const AdminMatchesPage: React.FC = () => {
                       <input type="number" step="0.01" className="w-full bg-background/50 border border-white/10 rounded-xl px-2 py-2 outline-none focus:border-blue-500 text-center font-bold text-blue-500" required value={formData.odds.team2Win} onChange={e => setFormData({...formData, odds: {...formData.odds, team2Win: parseFloat(e.target.value)}})} />
                     </div>
                   </div>
+
+                  {/* Stream Settings */}
+                  <h3 className="text-lg font-bold mt-8 mb-2 text-rose-500 flex items-center gap-2">
+                    <span>📺</span> إعدادات البث المباشر
+                  </h3>
+                  <div>
+                    <label className="block text-sm mb-1.5 text-muted-foreground">رابط البث (YouTube Embed أو أي رابط)</label>
+                    <input
+                      type="url"
+                      className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-rose-400 transition-colors text-slate-900"
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      value={formData.streamUrl}
+                      onChange={e => setFormData({...formData, streamUrl: e.target.value})}
+                    />
+                    <p className="text-xs text-slate-400 mt-1">ادخل رابط YouTube أو أي رابط بث مباشر. سيتم تحويله تلقائياً لرابط embed.</p>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50 border border-rose-200">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({...formData, isStreamActive: !formData.isStreamActive})}
+                      className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${formData.isStreamActive ? 'bg-rose-500' : 'bg-slate-300'}`}
+                    >
+                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${formData.isStreamActive ? 'translate-x-7' : 'translate-x-1'}`} />
+                    </button>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">{formData.isStreamActive ? '🔴 البث نشط – سيظهر للمستخدمين' : '⏹️ البث موقف – لن يظهر للمستخدمين'}</p>
+                      <p className="text-xs text-slate-500">قم بتفعيله عند بدء البث الفعلي للمباراة</p>
+                    </div>
+                  </div>
                 </div>
               </div>
   
@@ -470,6 +519,18 @@ export const AdminMatchesPage: React.FC = () => {
                       </button>
                     </div>
                   )}
+                  {/* Quick Stream Toggle */}
+                  <button
+                    onClick={() => handleToggleStream(match)}
+                    className={`w-full py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border ${
+                      match.isStreamActive
+                        ? 'bg-red-500/10 border-red-500/30 text-red-500 hover:bg-red-500/20'
+                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${match.isStreamActive ? 'bg-red-500 animate-pulse' : 'bg-slate-300'}`} />
+                    {match.isStreamActive ? '🔴 البث نشط – إيقاف' : '📺 تفعيل البث'}
+                  </button>
                   <div className="flex gap-2 mt-3">
                     <Button variant="outline" className="flex-1 h-9 text-xs border-white/10 text-slate-900" onClick={() => handleEditClick(match)}>
                       <Edit size={14} className="mr-1.5" /> تعديل

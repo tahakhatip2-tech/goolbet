@@ -1,10 +1,214 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String              @id @default(uuid())
+  email            String?             @unique
+  passwordHash     String?
+  firstName        String?
+  lastName         String?
+  telegramId       String?             @unique
+  telegramUsername String?
+  role             Role                @default(USER)
+  isActive         Boolean             @default(true)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  username         String?             @unique
+  adminLogs        AuditLog[]          @relation("AdminAudit")
+  auditLogs        AuditLog[]          @relation("UserAudit")
+  bets             Bet[]
+  deposits         Deposit[]
+  notifications    Notification[]
+  wallet           Wallet?
+  transactions     WalletTransaction[]
+  withdrawals      Withdrawal[]
+  comments         MatchComment[]
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String
+  link      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Wallet {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  balance            Float    @default(0.0)
+  lockedBalance      Float    @default(0.0)
+  totalDeposited     Float    @default(0.0)
+  totalWithdrawn     Float    @default(0.0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  bonusBalance       Float    @default(0.0)
+  lockedBonusBalance Float    @default(0.0)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Match {
+  id             String        @id @default(uuid())
+  team1Name      String
+  team1Logo      String?
+  team2Name      String
+  team2Logo      String?
+  league         String
+  matchDate      DateTime
+  status         MatchStatus   @default(DRAFT)
+  description    String?
+  result         BetSelection?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  team1Score     Int           @default(0)
+  team2Score     Int           @default(0)
+  endedAt        DateTime?
+  extraTimeTeam1 Int           @default(0)
+  extraTimeTeam2 Int           @default(0)
+  isKnockout     Boolean       @default(false)
+  liveUpdate     String?
+  matchPhase     String?
+  penaltiesTeam1 Int           @default(0)
+  penaltiesTeam2 Int           @default(0)
+  resultAt90     BetSelection?
+  startedAt      DateTime?
+  streamUrl      String?
+  isStreamActive Boolean       @default(false)
+  bets           Bet[]
+  odds           Odds[]
+  settlements    Settlement[]
+  comments       MatchComment[]
+}
+
+model Odds {
+  id        String   @id @default(uuid())
+  matchId   String
+  team1Win  Float
+  draw      Float
+  team2Win  Float
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model Bet {
+  id              String       @id @default(uuid())
+  userId          String
+  matchId         String
+  selection       BetSelection
+  stake           Float
+  oddsAtBet       Float
+  potentialPayout Float
+  status          BetStatus    @default(PENDING)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  isBonus         Boolean      @default(false)
+  match           Match        @relation(fields: [matchId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+  settlement      Settlement?
+}
+
+model WalletTransaction {
+  id          String            @id @default(uuid())
+  userId      String
+  type        TransactionType
+  amount      Float
+  currency    String            @default("USDT")
+  status      TransactionStatus @default(COMPLETED)
+  referenceId String?           @unique
+  details     String?
+  createdAt   DateTime          @default(now())
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Deposit {
+  id              String            @id @default(uuid())
+  userId          String
+  amount          Float
+  network         String
+  transactionHash String?
+  screenshotUrl   String?
+  status          TransactionStatus @default(PENDING)
+  adminNote       String?
+  processedById   String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  user            User              @relation(fields: [userId], references: [id])
+}
+
+model Withdrawal {
+  id            String            @id @default(uuid())
+  userId        String
+  amount        Float
+  network       String
+  walletAddress String
+  proofUrl      String?
+  status        TransactionStatus @default(PENDING)
+  adminNote     String?
+  processedById String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  user          User              @relation(fields: [userId], references: [id])
+}
+
+model Settlement {
+  id        String   @id @default(uuid())
+  matchId   String
+  betId     String   @unique
+  amount    Float
+  isWin     Boolean
+  createdAt DateTime @default(now())
+  bet       Bet      @relation(fields: [betId], references: [id])
+  match     Match    @relation(fields: [matchId], references: [id])
+}
+
+model MatchComment {
+  id        String   @id @default(uuid())
+  matchId   String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String
+  userId     String?
+  adminId    String?
+  details    String
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+  adminUser  User?    @relation("AdminAudit", fields: [adminId], references: [id])
+  targetUser User?    @relation("UserAudit", fields: [userId], references: [id])
+}
+
+model SystemSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+}
+
+model League {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  logo      String?
+  country   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -17,10 +221,10 @@ enum MatchStatus {
   DRAFT
   UPCOMING
   LIVE
-  EXTRA_TIME
-  PENALTIES
   FINISHED
   CANCELLED
+  EXTRA_TIME
+  PENALTIES
 }
 
 enum BetSelection {
@@ -51,207 +255,4 @@ enum TransactionStatus {
   REJECTED
   COMPLETED
   FAILED
-}
-
-model User {
-  id               String   @id @default(uuid())
-  email            String?  @unique
-  username         String?  @unique
-  passwordHash     String?
-  firstName        String?
-  lastName         String?
-  telegramId       String?  @unique
-  telegramUsername String?
-  role             Role     @default(USER)
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  wallet           Wallet?
-  bets             Bet[]
-  transactions     WalletTransaction[]
-  notifications    Notification[]
-  auditLogs        AuditLog[]          @relation("UserAudit")
-  adminLogs        AuditLog[]          @relation("AdminAudit")
-  deposits         Deposit[]
-  withdrawals      Withdrawal[]
-}
-
-model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  title     String
-  message   String
-  isRead    Boolean  @default(false)
-  type      String   // e.g., 'TRANSACTION', 'BET', 'SYSTEM'
-  link      String?  // Optional URL to redirect when clicked
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Wallet {
-  id                 String   @id @default(uuid())
-  userId             String   @unique
-  balance            Float    @default(0.0) // Available real balance
-  lockedBalance      Float    @default(0.0) // Staked or pending withdrawal (real)
-  bonusBalance       Float    @default(0.0) // Available bonus balance
-  lockedBonusBalance Float    @default(0.0) // Staked bonus balance
-  totalDeposited     Float    @default(0.0)
-  totalWithdrawn     Float    @default(0.0)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Match {
-  id          String      @id @default(uuid())
-  team1Name   String
-  team1Logo   String?
-  team1Score  Int         @default(0)
-  team2Name   String
-  team2Logo   String?
-  team2Score  Int         @default(0)
-  league      String
-  matchDate   DateTime
-  status      MatchStatus @default(DRAFT)
-  description String?
-  result      BetSelection?
-
-  // Live Match Control Fields
-  matchPhase        String?       // FIRST_HALF | HALF_TIME | SECOND_HALF | EXTRA_TIME_FIRST | EXTRA_TIME_SECOND | PENALTIES
-  liveUpdate        String?       // Live text update shown to users
-  resultAt90        BetSelection? // Result at 90 mins for correct bet settlement
-  isKnockout        Boolean       @default(false) // Is this a knockout/elimination match?
-  extraTimeTeam1    Int           @default(0)     // Extra time goals team 1
-  extraTimeTeam2    Int           @default(0)     // Extra time goals team 2
-  penaltiesTeam1    Int           @default(0)     // Penalty shootout score team 1
-  penaltiesTeam2    Int           @default(0)     // Penalty shootout score team 2
-  startedAt         DateTime?     // Actual match start time
-  endedAt           DateTime?     // Actual match end time
-
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  odds        Odds[]
-  bets        Bet[]
-  settlements Settlement[]
-}
-
-model Odds {
-  id         String   @id @default(uuid())
-  matchId    String
-  team1Win   Float
-  draw       Float
-  team2Win   Float
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-
-  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-}
-
-model Bet {
-  id              String       @id @default(uuid())
-  userId          String
-  matchId         String
-  selection       BetSelection
-  stake           Float
-  oddsAtBet       Float
-  potentialPayout Float
-  isBonus         Boolean      @default(false)
-  status          BetStatus    @default(PENDING)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-
-  user       User         @relation(fields: [userId], references: [id])
-  match      Match        @relation(fields: [matchId], references: [id])
-  settlement Settlement?
-}
-
-model WalletTransaction {
-  id          String            @id @default(uuid())
-  userId      String
-  type        TransactionType
-  amount      Float
-  currency    String            @default("USDT")
-  status      TransactionStatus @default(COMPLETED)
-  referenceId String?           @unique
-  details     String?
-  createdAt   DateTime          @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Deposit {
-  id             String            @id @default(uuid())
-  userId         String
-  amount         Float
-  network        String
-  transactionHash String?
-  screenshotUrl  String?
-  status         TransactionStatus @default(PENDING)
-  adminNote      String?
-  processedById  String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Withdrawal {
-  id             String            @id @default(uuid())
-  userId         String
-  amount         Float
-  network        String
-  walletAddress  String
-  proofUrl       String?
-  status         TransactionStatus @default(PENDING)
-  adminNote      String?
-  processedById  String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Settlement {
-  id        String   @id @default(uuid())
-  matchId   String
-  betId     String   @unique
-  amount    Float    // Payout amount
-  isWin     Boolean
-  createdAt DateTime @default(now())
-
-  match Match @relation(fields: [matchId], references: [id])
-  bet   Bet   @relation(fields: [betId], references: [id])
-}
-
-model AuditLog {
-  id          String   @id @default(uuid())
-  action      String
-  userId      String?  // Target user if applicable
-  adminId     String?  // Admin performing the action
-  details     String
-  ipAddress   String?
-  createdAt   DateTime @default(now())
-
-  targetUser User? @relation("UserAudit", fields: [userId], references: [id])
-  adminUser  User? @relation("AdminAudit", fields: [adminId], references: [id])
-}
-
-model SystemSetting {
-  id    String @id @default(uuid())
-  key   String @unique
-  value String
-}
-
-model League {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  logo      String?
-  country   String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

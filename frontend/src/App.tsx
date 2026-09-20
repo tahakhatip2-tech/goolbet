@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { UserLayout } from './layouts/UserLayout';
 import { MatchesPage } from './pages/MatchesPage';
 import { WalletPage } from './pages/WalletPage';
+import { WatchPage } from './pages/WatchPage';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminHome } from './pages/admin/AdminHome';
 import { AdminMatchesPage } from './pages/admin/AdminMatchesPage';
@@ -44,6 +45,7 @@ function App() {
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/watch/:matchId" element={<WatchPage />} />
         <Route path="/*" element={
           <UserLayout>
             <Routes>
