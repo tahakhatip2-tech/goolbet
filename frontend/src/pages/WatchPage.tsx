@@ -99,7 +99,7 @@ export const WatchPage: React.FC = () => {
   }
 
   const embedUrl = match.streamUrl?.includes('youtube.com/watch?v=')
-    ? match.streamUrl.replace('watch?v=', 'embed/') + '?autoplay=1&rel=0'
+    ? match.streamUrl.replace('watch?v=', 'embed/') + '?autoplay=1&rel=0&controls=0&modestbranding=1&disablekb=1'
     : match.streamUrl;
 
   return (
