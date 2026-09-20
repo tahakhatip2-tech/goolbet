@@ -22,6 +22,19 @@ export function useMatchChat({ matchId, token, initialMessages = [] }: UseMatchC
   const [connected, setConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
+  // Sync initialMessages when they arrive from API
+  useEffect(() => {
+    if (initialMessages.length > 0) {
+      setMessages(prev => {
+        // Only add initial messages if they are not already in the state
+        const newMessages = initialMessages.filter(
+          initialMsg => !prev.some(existingMsg => existingMsg.id === initialMsg.id)
+        );
+        return [...newMessages, ...prev];
+      });
+    }
+  }, [initialMessages]);
+
   useEffect(() => {
     const socket = io(import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000', {
       auth: { token: token || undefined },
