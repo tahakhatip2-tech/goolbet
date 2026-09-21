@@ -56,12 +56,19 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
           
           {/* Type & Date Row */}
           <div className="flex items-center justify-between pt-3">
-            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${
-              tx.type === 'DEPOSIT' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
-            }`}>
-              {tx.type === 'DEPOSIT' ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-              {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                tx.type === 'DEPOSIT' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
+              }`}>
+                {tx.type === 'DEPOSIT' ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
+              </span>
+              {tx.status !== 'PENDING' && (
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                  {tx.status === 'COMPLETED' ? 'مكتمل' : 'مرفوض'}
+                </span>
+              )}
+            </div>
             <div className="text-left">
               <div className="text-xs text-slate-500 font-medium">{new Date(tx.createdAt).toLocaleDateString('ar-EG')}</div>
               <div className="text-[10px] text-slate-400">{new Date(tx.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
@@ -102,21 +109,29 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
           )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <button
-              disabled={isProcessing}
-              onClick={() => onProcess(tx.id, 'APPROVE')}
-              className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Check size={15} /> موافقة
-            </button>
-            <button
-              disabled={isProcessing}
-              onClick={() => onProcess(tx.id, 'REJECT')}
-              className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <X size={15} /> رفض
-            </button>
+          <div className="pt-1">
+            {tx.status === 'PENDING' ? (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  disabled={isProcessing}
+                  onClick={() => onProcess(tx.id, 'APPROVE')}
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Check size={15} /> موافقة
+                </button>
+                <button
+                  disabled={isProcessing}
+                  onClick={() => onProcess(tx.id, 'REJECT')}
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X size={15} /> رفض
+                </button>
+              </div>
+            ) : (
+              <div className={`text-center py-2.5 rounded-xl text-sm font-bold border ${tx.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                {tx.status === 'COMPLETED' ? 'مكتمل ✅' : 'مرفوض ❌'}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -232,7 +247,7 @@ export const AdminTransactionsPage: React.FC = () => {
           ))}
           <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mr-auto">
             <AlertCircle size={13} className="text-amber-500" />
-            {filtered.length} طلب معلق
+            {filtered.filter(t => t.status === 'PENDING').length} طلب معلق
           </div>
         </div>
 
@@ -292,12 +307,19 @@ export const AdminTransactionsPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-                          tx.type === 'DEPOSIT' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
-                        }`}>
-                          {tx.type === 'DEPOSIT' ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                          {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
-                        </span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                            tx.type === 'DEPOSIT' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
+                          }`}>
+                            {tx.type === 'DEPOSIT' ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                            {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
+                          </span>
+                          {tx.status !== 'PENDING' && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                              {tx.status === 'COMPLETED' ? 'مكتمل' : 'مرفوض'}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-center">
                         <span className={`font-black text-base ${tx.type === 'DEPOSIT' ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -326,16 +348,22 @@ export const AdminTransactionsPage: React.FC = () => {
                         <div className="text-[10px] text-slate-400">{new Date(tx.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <div className="flex gap-2 justify-center">
-                          <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'APPROVE')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50">
-                            <Check size={13} /> موافقة
-                          </button>
-                          <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'REJECT')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50">
-                            <X size={13} /> رفض
-                          </button>
-                        </div>
+                        {tx.status === 'PENDING' ? (
+                          <div className="flex gap-2 justify-center">
+                            <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'APPROVE')}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50">
+                              <Check size={13} /> موافقة
+                            </button>
+                            <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'REJECT')}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50">
+                              <X size={13} /> رفض
+                            </button>
+                          </div>
+                        ) : (
+                          <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold border ${tx.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                            {tx.status === 'COMPLETED' ? 'مكتمل ✅' : 'مرفوض ❌'}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );

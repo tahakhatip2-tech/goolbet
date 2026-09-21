@@ -438,13 +438,13 @@ export const settleMatch = async (req: Request, res: Response) => {
   }
 };
 
-// Get Pending Transactions (Deposits and Withdrawals)
 export const getPendingTransactions = async (req: Request, res: Response) => {
   try {
     const transactions = await prisma.walletTransaction.findMany({
-      where: { status: 'PENDING' },
+      where: { type: { in: ['DEPOSIT', 'WITHDRAWAL'] } },
       include: { user: { select: { email: true, firstName: true, lastName: true } } },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take: 200
     });
     res.json(transactions);
   } catch (error) {
