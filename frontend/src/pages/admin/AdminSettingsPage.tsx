@@ -8,6 +8,7 @@ export const AdminSettingsPage: React.FC = () => {
   const { toast } = useToast();
   const [depositMethods, setDepositMethods] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   
   const [formData, setFormData] = useState({
@@ -39,6 +40,7 @@ export const AdminSettingsPage: React.FC = () => {
   };
 
   const saveSettings = async (methods: any[]) => {
+    setIsSaving(true);
     try {
       await api.put('/admin/settings/DEPOSIT_METHODS', { value: methods });
       setDepositMethods(methods);
@@ -47,6 +49,8 @@ export const AdminSettingsPage: React.FC = () => {
       resetForm();
     } catch (error) {
       toast.error('حدث خطأ أثناء حفظ الإعدادات');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -166,16 +170,16 @@ export const AdminSettingsPage: React.FC = () => {
               <div className="flex gap-2">
                 {editingIndex !== null ? (
                   <>
-                    <button onClick={resetForm} className="px-4 py-2 rounded-xl text-sm font-medium bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-2">
+                    <button onClick={resetForm} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-medium bg-slate-700 text-white hover:bg-slate-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                       <X className="w-4 h-4" /> إلغاء
                     </button>
-                    <button onClick={handleUpdateMethod} className="px-4 py-2 rounded-xl text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20">
-                      <Save className="w-4 h-4" /> حفظ التعديلات
+                    <button onClick={handleUpdateMethod} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                      <Save className="w-4 h-4" /> {isSaving ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                     </button>
                   </>
                 ) : (
-                  <button onClick={handleAddMethod} className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-2 shadow-lg shadow-green-500/20">
-                    <Plus className="w-4 h-4" /> إضافة الطريقة
+                  <button onClick={handleAddMethod} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-2 shadow-lg shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <Plus className="w-4 h-4" /> {isSaving ? 'جاري الإضافة...' : 'إضافة الطريقة'}
                   </button>
                 )}
               </div>
