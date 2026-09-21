@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Footer } from '../components/ui/Footer';
-import { LayoutDashboard, Trophy, Users, Receipt, Target, Menu, LogOut, Gift, MoreHorizontal, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, Trophy, Users, Receipt, Target, Menu, LogOut, Gift, MoreHorizontal, ArrowRight, Globe } from 'lucide-react';
 import api from '../api/axios';
 import { NotificationDropdown } from '../components/ui/NotificationDropdown';
 
@@ -66,7 +66,7 @@ export const AdminLayout: React.FC = () => {
     { name: 'المعاملات', path: '/admin/transactions', icon: Receipt },
     { name: 'الرهانات', path: '/admin/bets', icon: Target },
     { name: 'البونص', path: '/admin/bonus', icon: Gift },
-    { name: 'استيراد المباريات', path: '/admin/api-hub', icon: Target },
+    { name: 'استيراد المباريات', path: '/admin/api-hub', icon: Globe },
     { name: 'الدوريات', path: '/admin/leagues', icon: Trophy }
   ];
 
@@ -140,6 +140,10 @@ export const AdminLayout: React.FC = () => {
                       <Link to="/admin/leagues" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 text-sm font-medium transition-colors text-slate-700">
                         <Trophy size={18} className="text-primary" />
                         الدوريات
+                      </Link>
+                      <Link to="/admin/api-hub" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 text-sm font-medium transition-colors text-slate-700">
+                        <Globe size={18} className="text-primary" />
+                        استيراد المباريات
                       </Link>
                       <div className="h-px bg-border/50 my-1"></div>
                       <Link to="/" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 text-sm font-medium transition-colors text-slate-700">

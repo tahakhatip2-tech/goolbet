@@ -133,7 +133,7 @@ export const AdminApiHubPage: React.FC = () => {
       <HeroSection 
         title={
           <>
-            مركز <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400">الـ API</span>
+            استيراد <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400">المباريات</span>
           </>
         }
         subtitle="تصفح المباريات الحية والقادمة واستوردها بضغطة زر."
