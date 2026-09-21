@@ -138,15 +138,15 @@ export const AdminApiHubPage: React.FC = () => {
         }
         subtitle="تصفح المباريات الحية والقادمة واستوردها بضغطة زر."
         badge="مزامنة تلقائية 🌐"
-        minHeight="min-h-[40vh]"
+        minHeight="min-h-[33vh]"
       />
 
       <div className="container mx-auto px-4 -mt-10 relative z-20">
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div className="relative">
-              <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <Trophy size={18} className="text-amber-500" />
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Trophy size={14} className="text-amber-500" />
                 الدوري (بحث)
               </label>
               <input 
@@ -158,12 +158,12 @@ export const AdminApiHubPage: React.FC = () => {
                 }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder={leaguesLoading ? 'جاري تحميل الدوريات...' : 'اكتب اسم الدوري أو الدولة (بالإنجليزية)...'}
+                placeholder={leaguesLoading ? 'جاري تحميل الدوريات...' : 'اكتب اسم الدوري...'}
                 disabled={leaguesLoading}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
               />
-              <span className="text-xs font-bold text-slate-400 mt-1.5 block">
-                ملاحظة: الرجاء البحث باللغة الإنجليزية (مثال: Jordan, Super Cup, Premier)
+              <span className="text-[10px] font-bold text-slate-400 mt-1 block">
+                ملاحظة: الرجاء البحث باللغة الإنجليزية (مثال: Jordan, Premier)
               </span>
               {showDropdown && (
                 <div className="absolute top-full mt-2 w-full max-h-64 overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-100 z-50">
@@ -193,8 +193,8 @@ export const AdminApiHubPage: React.FC = () => {
             </div>
 
             <div className="relative">
-              <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <Trophy size={18} className="text-amber-500" />
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Trophy size={14} className="text-amber-500" />
                 بحث عن فريق (فلترة)
               </label>
               <input 
@@ -203,16 +203,16 @@ export const AdminApiHubPage: React.FC = () => {
                 onChange={(e) => setTeamSearch(e.target.value)}
                 placeholder="اكتب اسم الفريق..."
                 disabled={fixtures.length === 0}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
               />
             </div>
             
             <button 
               onClick={fetchFixtures}
               disabled={loading || !selectedLeague}
-              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-500/30 disabled:opacity-50 h-[50px]"
+              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md shadow-purple-500/30 disabled:opacity-50 h-[38px] mt-1 md:mt-0"
             >
-              <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               {loading ? 'جاري الجلب...' : 'تحديث المباريات'}
             </button>
           </div>
