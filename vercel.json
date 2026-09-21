@@ -14,7 +14,7 @@
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": "backend/prisma/**",
+      "includeFiles": "{backend/prisma/**,backend/node_modules/.prisma/client/**}",
       "maxDuration": 30
     }
   }

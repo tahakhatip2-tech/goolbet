@@ -3,17 +3,20 @@
   "private": true,
   "scripts": {
     "postinstall": "cd frontend && npm install && cd ../backend && npm install",
-    "build": "cd frontend && npm run build && cd .. && npx prisma generate --schema=./backend/prisma/schema.prisma"
+    "build": "cd frontend && npm run build && cd ../backend && npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.11.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
-    "prisma": "^5.11.0"
+    "prisma": "^5.11.0",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
