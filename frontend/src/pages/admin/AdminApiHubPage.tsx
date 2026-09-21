@@ -138,15 +138,13 @@ export const AdminApiHubPage: React.FC = () => {
         }
         subtitle="تصفح المباريات الحية والقادمة واستوردها بضغطة زر."
         badge="مزامنة تلقائية 🌐"
-        minHeight="min-h-[33vh]"
-      />
-
-      <div className="container mx-auto px-4 -mt-10 relative z-20">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div className="relative">
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Trophy size={14} className="text-amber-500" />
+        minHeight="min-h-[40vh]"
+      >
+        <div className="w-full max-w-lg mx-auto bg-white/30 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/50 shadow-xl mt-2">
+          <div className="grid grid-cols-2 gap-2 md:gap-3 items-end mb-2">
+            <div className="relative text-start">
+              <label className="block text-[10px] md:text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5 drop-shadow-sm">
+                <Trophy size={12} className="text-amber-500" />
                 الدوري (بحث)
               </label>
               <input 
@@ -158,17 +156,14 @@ export const AdminApiHubPage: React.FC = () => {
                 }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder={leaguesLoading ? 'جاري تحميل الدوريات...' : 'اكتب اسم الدوري...'}
+                placeholder={leaguesLoading ? 'جاري التحميل...' : 'اسم الدوري...'}
                 disabled={leaguesLoading}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
+                className="w-full bg-white/50 border border-white/60 rounded-xl px-2 py-1.5 md:py-2 text-xs md:text-sm outline-none focus:border-purple-400 focus:bg-white/70 transition-all text-slate-900 font-bold disabled:opacity-50 placeholder:text-slate-500"
               />
-              <span className="text-[10px] font-bold text-slate-400 mt-1 block">
-                ملاحظة: الرجاء البحث باللغة الإنجليزية (مثال: Jordan, Premier)
-              </span>
               {showDropdown && (
-                <div className="absolute top-full mt-2 w-full max-h-64 overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-100 z-50">
+                <div className="absolute top-full mt-1 w-full max-h-48 overflow-y-auto bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-slate-100 z-50 text-start">
                   {filteredLeagues.length === 0 ? (
-                    <div className="p-4 text-center text-slate-500 text-sm">لا توجد نتائج</div>
+                    <div className="p-3 text-center text-slate-500 text-xs">لا توجد نتائج</div>
                   ) : (
                     filteredLeagues.slice(0, 100).map((l: any) => (
                       <div 
@@ -178,12 +173,12 @@ export const AdminApiHubPage: React.FC = () => {
                           setSearchQuery(`${l.league.name} (${l.country.name})`);
                           setShowDropdown(false);
                         }}
-                        className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors"
+                        className="flex items-center gap-2 p-2 hover:bg-purple-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors"
                       >
-                        <img src={l.league.logo} alt={l.league.name} className="w-8 h-8 object-contain" />
+                        <img src={l.league.logo} alt={l.league.name} className="w-5 h-5 md:w-6 md:h-6 object-contain" />
                         <div>
-                          <div className="font-bold text-slate-800 text-sm">{l.league.name}</div>
-                          <div className="text-xs text-slate-500">{l.country.name}</div>
+                          <div className="font-bold text-slate-800 text-[10px] md:text-xs">{l.league.name}</div>
+                          <div className="text-[9px] text-slate-500">{l.country.name}</div>
                         </div>
                       </div>
                     ))
@@ -192,31 +187,34 @@ export const AdminApiHubPage: React.FC = () => {
               )}
             </div>
 
-            <div className="relative">
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Trophy size={14} className="text-amber-500" />
-                بحث عن فريق (فلترة)
+            <div className="relative text-start">
+              <label className="block text-[10px] md:text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5 drop-shadow-sm">
+                <Trophy size={12} className="text-amber-500" />
+                بحث فريق
               </label>
               <input 
                 type="text" 
                 value={teamSearch}
                 onChange={(e) => setTeamSearch(e.target.value)}
-                placeholder="اكتب اسم الفريق..."
+                placeholder="اسم الفريق..."
                 disabled={fixtures.length === 0}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors text-slate-900 font-bold disabled:opacity-50"
+                className="w-full bg-white/50 border border-white/60 rounded-xl px-2 py-1.5 md:py-2 text-xs md:text-sm outline-none focus:border-purple-400 focus:bg-white/70 transition-all text-slate-900 font-bold disabled:opacity-50 placeholder:text-slate-500"
               />
             </div>
-            
-            <button 
-              onClick={fetchFixtures}
-              disabled={loading || !selectedLeague}
-              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md shadow-purple-500/30 disabled:opacity-50 h-[38px] mt-1 md:mt-0"
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              {loading ? 'جاري الجلب...' : 'تحديث المباريات'}
-            </button>
           </div>
+          
+          <button 
+            onClick={fetchFixtures}
+            disabled={loading || !selectedLeague}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500/80 to-indigo-500/80 hover:from-purple-600 hover:to-indigo-600 backdrop-blur-md text-white border border-white/30 px-4 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            {loading ? 'جاري الجلب...' : 'تحديث المباريات'}
+          </button>
         </div>
+      </HeroSection>
+
+      <div className="container mx-auto px-2 md:px-4 relative z-20 mt-4">
 
         {loading ? (
           <div className="flex justify-center items-center h-40">
