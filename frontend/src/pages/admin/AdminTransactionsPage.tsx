@@ -6,7 +6,12 @@ import { Receipt, Check, X, CreditCard, ExternalLink, Clock, TrendingDown, Trend
 const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPROVE' | 'REJECT') => void; processingId: string | null }> = ({ tx, onProcess, processingId }) => {
   const [expanded, setExpanded] = useState(false);
   const [imgOpen, setImgOpen] = useState(false);
-  const details = JSON.parse(tx.details || '{}');
+  let details: any = {};
+  try {
+    details = JSON.parse(tx.details || '{}');
+  } catch (e) {
+    details = { method: tx.details };
+  }
   const isProcessing = processingId === tx.id;
   const receiptUrl = details.receiptImage ? `http://localhost:5000/uploads/${details.receiptImage}` : null;
 
@@ -291,7 +296,12 @@ export const AdminTransactionsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filtered.map(tx => {
-                  const details = JSON.parse(tx.details || '{}');
+                  let details: any = {};
+                  try {
+                    details = JSON.parse(tx.details || '{}');
+                  } catch (e) {
+                    details = { method: tx.details };
+                  }
                   const isProcessing = processingId === tx.id;
                   return (
                     <tr key={tx.id} className="hover:bg-blue-50/30 transition-colors duration-150">
