@@ -3,7 +3,7 @@ import api from '../../api/axios';
 import { HeroSection } from '../../components/ui/HeroSection';
 import { Receipt, Check, X, CreditCard, ExternalLink, Clock, TrendingDown, TrendingUp, AlertCircle, ChevronDown } from 'lucide-react';
 
-const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPROVE' | 'REJECT') => void; processingId: string | null }> = ({ tx, onProcess, processingId }) => {
+const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPROVE' | 'REJECT') => void; processingId: string | null; processingAction: 'APPROVE' | 'REJECT' | null }> = ({ tx, onProcess, processingId, processingAction }) => {
   const [expanded, setExpanded] = useState(false);
   const [imgOpen, setImgOpen] = useState(false);
   let details: any = {};
@@ -122,14 +122,14 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
                   onClick={() => onProcess(tx.id, 'APPROVE')}
                   className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Check size={15} /> موافقة
+                  {isProcessing && processingAction === 'APPROVE' ? 'جاري...' : <><Check size={15} /> موافقة</>}
                 </button>
                 <button
                   disabled={isProcessing}
                   onClick={() => onProcess(tx.id, 'REJECT')}
                   className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <X size={15} /> رفض
+                  {isProcessing && processingAction === 'REJECT' ? 'جاري...' : <><X size={15} /> رفض</>}
                 </button>
               </div>
             ) : (
@@ -152,6 +152,7 @@ export const AdminTransactionsPage: React.FC = () => {
   const [stats, setStats] = useState({ totalCount: 0, depositCount: 0, withdrawCount: 0, totalAmount: 0 });
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<'APPROVE' | 'REJECT' | null>(null);
   const [filter, setFilter] = useState<'ALL' | 'DEPOSIT' | 'WITHDRAWAL'>('ALL');
   const { toast } = useToast();
 
@@ -178,6 +179,7 @@ export const AdminTransactionsPage: React.FC = () => {
   const handleProcess = async (id: string, action: 'APPROVE' | 'REJECT') => {
     if (!confirm(action === 'APPROVE' ? 'هل أنت متأكد من قبول هذه المعاملة؟' : 'هل أنت متأكد من رفض هذه المعاملة؟')) return;
     setProcessingId(id);
+    setProcessingAction(action);
     try {
       await api.put(`/admin/transactions/${id}/process`, { action });
       fetchData(); // re-fetch both pending tx and stats
@@ -186,6 +188,7 @@ export const AdminTransactionsPage: React.FC = () => {
       toast.error('حدث خطأ أثناء معالجة المعاملة');
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -267,7 +270,7 @@ export const AdminTransactionsPage: React.FC = () => {
             </div>
           ) : (
             filtered.map(tx => (
-              <TransactionCard key={tx.id} tx={tx} onProcess={handleProcess} processingId={processingId} />
+              <TransactionCard key={tx.id} tx={tx} onProcess={handleProcess} processingId={processingId} processingAction={processingAction} />
             ))
           )}
         </div>
@@ -362,11 +365,11 @@ export const AdminTransactionsPage: React.FC = () => {
                           <div className="flex gap-2 justify-center">
                             <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'APPROVE')}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-50">
-                              <Check size={13} /> موافقة
+                              {isProcessing && processingAction === 'APPROVE' ? 'جاري...' : <><Check size={13} /> موافقة</>}
                             </button>
                             <button disabled={isProcessing} onClick={() => handleProcess(tx.id, 'REJECT')}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-50">
-                              <X size={13} /> رفض
+                              {isProcessing && processingAction === 'REJECT' ? 'جاري...' : <><X size={13} /> رفض</>}
                             </button>
                           </div>
                         ) : (
