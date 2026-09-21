@@ -66,6 +66,7 @@ export const AdminLayout: React.FC = () => {
     { name: 'المعاملات', path: '/admin/transactions', icon: Receipt },
     { name: 'الرهانات', path: '/admin/bets', icon: Target },
     { name: 'البونص', path: '/admin/bonus', icon: Gift },
+    { name: 'استيراد المباريات', path: '/admin/api-hub', icon: Target },
     { name: 'الدوريات', path: '/admin/leagues', icon: Trophy }
   ];
 

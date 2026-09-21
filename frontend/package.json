@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.102.8",
+    "agora-rtc-sdk-ng": "^4.24.8",
     "autoprefixer": "^10.6.0",
     "axios": "^1.20.0",
     "i18next": "^26.4.2",

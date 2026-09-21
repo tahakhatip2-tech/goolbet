@@ -9,6 +9,7 @@ import adminRoutes from './routes/adminRoutes';
 import walletRoutes from './routes/walletRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import chatRoutes from './routes/chatRoutes';
+import apiFootballRoutes from './routes/apiFootballRoutes';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/bets', betRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/api-football', apiFootballRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);

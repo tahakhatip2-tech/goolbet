@@ -85,6 +85,7 @@ model Match {
   startedAt      DateTime?
   streamUrl      String?
   isStreamActive Boolean       @default(false)
+  apiFixtureId   Int?          @unique
   bets           Bet[]
   odds           Odds[]
   settlements    Settlement[]

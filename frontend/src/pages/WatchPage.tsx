@@ -4,6 +4,7 @@ import { ArrowRight, Users, Send, Wifi, WifiOff, Smile } from 'lucide-react';
 import api from '../api/axios';
 import { useMatchChat } from '../hooks/useMatchChat';
 import type { ChatMessage } from '../hooks/useMatchChat';
+import { AgoraViewer } from '../components/AgoraViewer';
 
 const REACTIONS = ['⚽', '🔥', '❤️', '😱', '👏', '😂'];
 
@@ -181,7 +182,9 @@ export const WatchPage: React.FC = () => {
 
           {/* Video Player */}
           <div className="flex-1 bg-black relative" style={{ minHeight: '240px' }}>
-            {match.isStreamActive && embedUrl ? (
+            {match.isStreamActive && match.streamUrl?.startsWith('agora://') ? (
+              <AgoraViewer channelName={match.streamUrl.replace('agora://', '')} />
+            ) : match.isStreamActive && embedUrl ? (
               <iframe
                 src={embedUrl}
                 className="absolute inset-0 w-full h-full"

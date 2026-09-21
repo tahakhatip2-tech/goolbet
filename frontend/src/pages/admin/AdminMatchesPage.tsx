@@ -3,8 +3,9 @@ import api from '../../api/axios';
 import { Button } from '../../components/ui/Button';
 import { BackendImage } from '../../components/BackendImage';
 import { HeroSection } from '../../components/ui/HeroSection';
-import { Plus, X, Edit, CheckCircle, Clock, CalendarDays, Activity, Trophy, ShieldHalf, Trash2, Loader2, PlayCircle, Settings } from 'lucide-react';
+import { Plus, X, Edit, CheckCircle, Clock, CalendarDays, Activity, Trophy, ShieldHalf, Trash2, Loader2, PlayCircle, Settings, Camera } from 'lucide-react';
 import { LiveControlPanel } from '../../components/LiveControlPanel';
+import { CameraBroadcast } from '../../components/CameraBroadcast';
 import { useToast } from '../../context/ToastContext';
 
 export const AdminMatchesPage: React.FC = () => {
@@ -14,6 +15,7 @@ export const AdminMatchesPage: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
   const [liveControlMatch, setLiveControlMatch] = useState<any | null>(null);
+  const [cameraBroadcastMatch, setCameraBroadcastMatch] = useState<any | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     team1Name: '', team2Name: '', league: '', matchDate: '', status: 'UPCOMING',
@@ -199,6 +201,19 @@ export const AdminMatchesPage: React.FC = () => {
     }
   };
 
+  const handleStreamStarted = async (url: string) => {
+    if (!cameraBroadcastMatch) return;
+    try {
+      await api.put(`/admin/matches/${cameraBroadcastMatch.id}`, {
+        streamUrl: url,
+        isStreamActive: true
+      });
+      fetchMatches();
+    } catch (error) {
+      toast.error('حدث خطأ أثناء تفعيل بث الكاميرا في قاعدة البيانات');
+    }
+  };
+
   if (loading) return (
     <div className="flex justify-center items-center h-[60vh]">
       <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
@@ -212,6 +227,14 @@ export const AdminMatchesPage: React.FC = () => {
           match={liveControlMatch} 
           onClose={() => setLiveControlMatch(null)} 
           onUpdate={fetchMatches} 
+        />
+      )}
+
+      {cameraBroadcastMatch && (
+        <CameraBroadcast
+          channelName={`match_${cameraBroadcastMatch.id}`}
+          onClose={() => setCameraBroadcastMatch(null)}
+          onStreamStarted={handleStreamStarted}
         />
       )}
       
@@ -488,11 +511,10 @@ export const AdminMatchesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Actions / Settlement Area */}
             <div className="p-4 border-t border-slate-200 bg-white backdrop-blur-md">
               {match.status !== 'FINISHED' ? (
                 <div className="space-y-3">
-                  {(match.status === 'UPCOMING' || match.status === 'DRAFT') && (
+                  {!match.apiFixtureId && (match.status === 'UPCOMING' || match.status === 'DRAFT') && (
                     <button 
                       onClick={() => handleStartMatch(match.id)} 
                       className="w-full py-3 px-4 rounded-xl bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
@@ -503,20 +525,33 @@ export const AdminMatchesPage: React.FC = () => {
                   )}
                   {match.status === 'LIVE' && (
                     <div className="flex flex-col gap-2">
-                      <button 
-                        onClick={() => setLiveControlMatch(match)} 
-                        className="w-full py-3 px-4 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
-                      >
-                        <Settings size={18} />
-                        لوحة التحكم الحي
-                      </button>
-                      <button 
-                        onClick={() => handleEndMatch(match)} 
-                        className="w-full py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm mt-1"
-                      >
-                        <CheckCircle size={18} />
-                        إنهاء المباراة
-                      </button>
+                      {!match.apiFixtureId && (
+                        <button 
+                          onClick={() => setLiveControlMatch(match)} 
+                          className="w-full py-3 px-4 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <Settings size={18} />
+                          لوحة التحكم الحي
+                        </button>
+                      )}
+                      {!match.apiFixtureId && (
+                        <button 
+                          onClick={() => setCameraBroadcastMatch(match)}
+                          className="w-full py-3 px-4 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm mt-1"
+                        >
+                          <Camera size={18} />
+                          بث من كاميرا الهاتف
+                        </button>
+                      )}
+                      {!match.apiFixtureId && (
+                        <button 
+                          onClick={() => handleEndMatch(match)} 
+                          className="w-full py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-600 font-bold transition-all flex items-center justify-center gap-2 shadow-sm mt-1"
+                        >
+                          <CheckCircle size={18} />
+                          إنهاء المباراة
+                        </button>
+                      )}
                     </div>
                   )}
                   {/* Quick Stream Toggle */}
@@ -532,9 +567,11 @@ export const AdminMatchesPage: React.FC = () => {
                     {match.isStreamActive ? '🔴 البث نشط – إيقاف' : '📺 تفعيل البث'}
                   </button>
                   <div className="flex gap-2 mt-3">
-                    <Button variant="outline" className="flex-1 h-9 text-xs border-white/10 text-slate-900" onClick={() => handleEditClick(match)}>
-                      <Edit size={14} className="mr-1.5" /> تعديل
-                    </Button>
+                    {!match.apiFixtureId && (
+                      <Button variant="outline" className="flex-1 h-9 text-xs border-white/10 text-slate-900" onClick={() => handleEditClick(match)}>
+                        <Edit size={14} className="mr-1.5" /> تعديل
+                      </Button>
+                    )}
                     <Button variant="outline" className="flex-1 h-9 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10" onClick={() => handleDelete(match.id)}>
                       <Trash2 size={14} className="mr-1.5" /> حذف
                     </Button>

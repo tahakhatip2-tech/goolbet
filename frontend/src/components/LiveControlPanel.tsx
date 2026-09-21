@@ -19,6 +19,7 @@ interface Match {
   extraTimeTeam2: number;
   penaltiesTeam1: number;
   penaltiesTeam2: number;
+  apiFixtureId?: number | null;
 }
 
 interface LiveControlPanelProps {
@@ -122,8 +123,24 @@ export const LiveControlPanel: React.FC<LiveControlPanelProps> = ({ match, onClo
       {/* Panel */}
       <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
-
-          {/* Header */}
+          
+          {match.apiFixtureId ? (
+            <div className="p-8 text-center flex flex-col items-center">
+              <Server size={48} className="text-purple-500 mb-4 animate-pulse" />
+              <h3 className="text-xl font-bold text-slate-800 mb-2">مباراة تدار تلقائياً (API)</h3>
+              <p className="text-slate-500 text-sm mb-6">
+                هذه المباراة متصلة بشكل مباشر بخدمة API-Football. يتم تحديث النتيجة ووقت المباراة وأحداثها تلقائياً بدون تدخل يدوي.
+              </p>
+              <button
+                onClick={onClose}
+                className="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold transition-all w-full"
+              >
+                حسناً، إغلاق
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
           <div className="bg-gradient-to-r from-green-600 to-emerald-500 text-white px-5 py-4 flex items-center justify-between shrink-0 rounded-t-3xl sm:rounded-t-3xl">
             <div className="flex items-center gap-2">
               <Zap className="w-5 h-5 animate-pulse" />
@@ -285,6 +302,8 @@ export const LiveControlPanel: React.FC<LiveControlPanelProps> = ({ match, onClo
               ) : '💾 حفظ جميع التحديثات'}
             </button>
           </div>
+          </>
+          )}
         </div>
       </div>
     </>
