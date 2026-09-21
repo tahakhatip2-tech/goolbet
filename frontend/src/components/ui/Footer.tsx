@@ -76,14 +76,9 @@ export const Footer: React.FC = () => {
           {/* Developer Signature */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100 shadow-sm">
             <span className="text-slate-500 text-[10px]">المطور:</span>
-            <a 
-              href="https://github.com/tahakhatip2-tech" 
-              target="_blank" 
-              rel="noreferrer"
-              className="font-bold text-[10px] bg-clip-text text-transparent bg-gradient-to-r from-primary to-green-500 hover:opacity-80 transition-opacity flex items-center gap-1"
-            >
+            <span className="font-bold text-[10px] bg-clip-text text-transparent bg-gradient-to-r from-primary to-green-500 flex items-center gap-1">
               طه الخطيب
-            </a>
+            </span>
           </div>
         </div>
 
