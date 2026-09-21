@@ -296,7 +296,17 @@ export const AdminApiHubPage: React.FC = () => {
                     disabled={importing === item.fixture.id}
                     className="w-full bg-transparent border border-blue-500 hover:bg-blue-50 text-blue-600 px-1 py-1.5 md:py-2.5 rounded-lg text-[10px] md:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                   >
-                    {importing === item.fixture.id ? '⏳ جاري الاستيراد...' : '📥 استيراد للمنصة'}
+                    {importing === item.fixture.id ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>جاري الاستيراد...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download size={14} />
+                        <span>استيراد للمنصة</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
