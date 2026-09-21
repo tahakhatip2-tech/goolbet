@@ -236,55 +236,50 @@ export const AdminApiHubPage: React.FC = () => {
               const isLive = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
               
               return (
-              <div key={item.fixture.id} className="bg-white rounded-3xl p-3 md:p-5 shadow-lg border border-slate-100 flex flex-col hover:shadow-xl transition-shadow relative overflow-hidden group">
+              <div key={item.fixture.id} className="bg-white rounded-3xl p-2 md:p-4 shadow-lg border border-slate-100 flex flex-col hover:shadow-xl transition-shadow relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-purple-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg line-clamp-1 max-w-[50%] flex items-center gap-1">
-                    <Trophy size={12} className="text-amber-500" />
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] md:text-xs font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md line-clamp-1 flex items-center gap-1">
+                    <Trophy size={10} className="text-amber-500" />
                     {item.league.name}
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     {isLive && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md animate-pulse">
+                      <span className="flex items-center gap-1 text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-md animate-pulse">
                         <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
                         مباشر
                       </span>
                     )}
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${isFinished ? 'bg-slate-100 text-slate-500' : 'bg-purple-50 text-purple-600'}`}>
-                      {item.fixture.status.short}
-                    </span>
                   </div>
                 </div>
 
-                <div className="flex justify-center items-center gap-1 mb-3 text-[10px] md:text-xs font-bold text-slate-500 bg-slate-50 py-1 md:py-1.5 rounded-lg">
-                  <Calendar size={12} className="text-purple-400" />
-                  {matchDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  <span className="mx-1">•</span>
-                  {matchDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                <div className="flex flex-col justify-center items-center gap-0 mb-2 text-[9px] md:text-xs font-bold text-slate-500 bg-slate-50 py-1 rounded-md">
+                  <span>{matchDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span className="text-slate-400">{matchDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                 </div>
 
-                <div className="flex items-center justify-between mt-1 mb-3">
+                <div className="flex items-center justify-between mt-1 mb-2">
                   <div className="flex flex-col items-center flex-1 w-1/3">
-                    <img src={item.teams.home.logo} alt="Home" className="w-8 h-8 md:w-12 md:h-12 object-contain mb-1 md:mb-2 drop-shadow-sm" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-800 text-center line-clamp-2 leading-tight" title={item.teams.home.name}>
+                    <img src={item.teams.home.logo} alt="Home" className="w-6 h-6 md:w-10 md:h-10 object-contain mb-1 drop-shadow-sm" />
+                    <span className="text-[9px] md:text-xs font-bold text-slate-800 text-center line-clamp-2 leading-tight" title={item.teams.home.name}>
                       {item.teams.home.name}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center justify-center shrink-0 mx-1 md:mx-2">
+                  <div className="flex flex-col items-center justify-center shrink-0 mx-1">
                     {isFinished || isLive ? (
-                      <div className="flex items-center gap-1 md:gap-2 text-base md:text-xl font-black text-slate-800 bg-slate-100 px-2 py-0.5 md:px-3 md:py-1 rounded-lg md:rounded-xl">
+                      <div className="flex items-center gap-1 text-sm md:text-xl font-black text-slate-800 bg-slate-100 px-1.5 py-0.5 md:px-3 md:py-1 rounded-md md:rounded-xl">
                         <span>{item.goals.home ?? 0}</span>
-                        <span className="text-slate-400 text-xs md:text-sm">-</span>
+                        <span className="text-slate-400 text-[10px] md:text-sm">-</span>
                         <span>{item.goals.away ?? 0}</span>
                       </div>
                     ) : (
-                      <div className="text-slate-300 font-black text-sm md:text-lg italic">VS</div>
+                      <div className="text-slate-300 font-black text-xs md:text-lg italic">VS</div>
                     )}
                   </div>
                   <div className="flex flex-col items-center flex-1 w-1/3">
-                    <img src={item.teams.away.logo} alt="Away" className="w-8 h-8 md:w-12 md:h-12 object-contain mb-1 md:mb-2 drop-shadow-sm" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-800 text-center line-clamp-2 leading-tight" title={item.teams.away.name}>
+                    <img src={item.teams.away.logo} alt="Away" className="w-6 h-6 md:w-10 md:h-10 object-contain mb-1 drop-shadow-sm" />
+                    <span className="text-[9px] md:text-xs font-bold text-slate-800 text-center line-clamp-2 leading-tight" title={item.teams.away.name}>
                       {item.teams.away.name}
                     </span>
                   </div>
@@ -297,11 +292,11 @@ export const AdminApiHubPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-slate-100">
+                <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-slate-100">
                   <button
                     onClick={() => handleImport(item)}
                     disabled={importing === item.fixture.id}
-                    className="w-full bg-slate-900 hover:bg-black text-white px-2 py-2 md:py-2.5 rounded-xl text-[10px] md:text-sm font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full bg-transparent border border-blue-500 hover:bg-blue-50 text-blue-600 px-1 py-1.5 md:py-2.5 rounded-lg text-[10px] md:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                   >
                     {importing === item.fixture.id ? '⏳ جاري الاستيراد...' : '📥 استيراد للمنصة'}
                   </button>
