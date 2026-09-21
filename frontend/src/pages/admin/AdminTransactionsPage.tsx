@@ -69,7 +69,7 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
                 {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
               </span>
               {tx.status !== 'PENDING' && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-orange-100 text-orange-700' : 'bg-rose-100 text-rose-700'}`}>
                   {tx.status === 'COMPLETED' ? 'مكتمل' : 'مرفوض'}
                 </span>
               )}
@@ -133,7 +133,7 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
                 </button>
               </div>
             ) : (
-              <div className={`text-center py-2.5 rounded-xl text-sm font-bold border ${tx.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+              <div className={`text-center py-2.5 rounded-xl text-sm font-bold border ${tx.status === 'COMPLETED' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
                 {tx.status === 'COMPLETED' ? 'مكتمل ✅' : 'مرفوض ❌'}
               </div>
             )}
@@ -325,7 +325,7 @@ export const AdminTransactionsPage: React.FC = () => {
                             {tx.type === 'DEPOSIT' ? 'إيداع' : 'سحب'}
                           </span>
                           {tx.status !== 'PENDING' && (
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tx.status === 'COMPLETED' ? 'bg-orange-100 text-orange-700' : 'bg-rose-100 text-rose-700'}`}>
                               {tx.status === 'COMPLETED' ? 'مكتمل' : 'مرفوض'}
                             </span>
                           )}
@@ -370,7 +370,7 @@ export const AdminTransactionsPage: React.FC = () => {
                             </button>
                           </div>
                         ) : (
-                          <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold border ${tx.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+                          <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold border ${tx.status === 'COMPLETED' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
                             {tx.status === 'COMPLETED' ? 'مكتمل ✅' : 'مرفوض ❌'}
                           </span>
                         )}
