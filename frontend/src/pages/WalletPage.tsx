@@ -8,13 +8,14 @@ import { useToast } from '../context/ToastContext';
 
 const TransactionCard = ({ tx }: { tx: any }) => {
   const [expanded, setExpanded] = useState(false);
+  const isPositive = tx.type === 'DEPOSIT' || tx.type === 'BET_WON';
   
   return (
     <div className="glass p-4 rounded-xl mb-3 border border-border/40 transition-all">
        <div className="flex justify-between items-center cursor-pointer" onClick={() => setExpanded(!expanded)}>
          <div className="flex items-center gap-3">
-           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${tx.amount > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-             {tx.amount > 0 ? '↓' : '↑'}
+           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${isPositive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+             {isPositive ? '↓' : '↑'}
            </div>
            <div>
               <p className="font-bold text-slate-800">
@@ -24,8 +25,8 @@ const TransactionCard = ({ tx }: { tx: any }) => {
            </div>
          </div>
          <div className="text-left flex items-center gap-3">
-            <p className={`font-bold font-mono text-lg ${tx.amount > 0 ? 'text-green-500' : 'text-slate-800'}`}>
-              {tx.amount > 0 ? '+' : ''}{tx.amount}$
+            <p className={`font-bold font-mono text-lg ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              {isPositive ? '+' : '-'}{Math.abs(tx.amount)}$
             </p>
             {expanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
          </div>
