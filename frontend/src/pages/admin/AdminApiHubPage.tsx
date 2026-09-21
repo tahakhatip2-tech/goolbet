@@ -136,9 +136,7 @@ export const AdminApiHubPage: React.FC = () => {
             استيراد <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400">المباريات</span>
           </>
         }
-        subtitle="تصفح المباريات الحية والقادمة واستوردها بضغطة زر."
-        badge="مزامنة تلقائية 🌐"
-        minHeight="min-h-[40vh]"
+        minHeight="min-h-[25vh]"
       >
         <div className="w-full max-w-lg mx-auto bg-white/30 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/50 shadow-xl mt-2">
           <div className="grid grid-cols-2 gap-2 md:gap-3 items-end mb-2">
