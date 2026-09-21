@@ -18,16 +18,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   minHeight = 'min-h-[40vh]',
 }) => {
   return (
-    <section className={`relative flex items-center justify-center ${minHeight} py-3 md:py-5 overflow-hidden mb-4 bg-slate-50 border-b border-slate-200/50`}>
-      {/* Background Image - Changed to contain to show completely */}
-      <div 
-        className="absolute inset-0 z-0 bg-contain bg-center bg-no-repeat opacity-20 md:opacity-40"
-        style={{ backgroundImage: `url('${backgroundImage}')` }}
-      ></div>
-      
-      {/* Subtle Gradient Overlay for Text Readability */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-t from-white/90 via-transparent to-white/90"></div>
-      <div className="absolute inset-0 z-0 bg-gradient-to-r from-white/80 via-transparent to-white/80"></div>
+    <section className={`relative flex items-center justify-center ${minHeight} py-3 md:py-5 mb-4 bg-slate-50 border-b border-slate-200/50`}>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Background Image - Changed to contain to show completely */}
+        <div 
+          className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-20 md:opacity-40"
+          style={{ backgroundImage: `url('${backgroundImage}')` }}
+        ></div>
+        
+        {/* Subtle Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-white/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-transparent to-white/80"></div>
+      </div>
 
       <div className="container mx-auto px-2 relative z-10 flex justify-center">
         <div className="w-full max-w-4xl text-center">
