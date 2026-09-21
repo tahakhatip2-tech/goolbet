@@ -83,7 +83,9 @@ export const HomePage: React.FC = () => {
               {featuredMatches.map(match => (
                 <div key={match.id} className="bg-white rounded-2xl p-3 relative overflow-hidden group hover:border-primary/40 transition-colors shadow-sm border border-slate-200">
                   <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                    <span className="text-[10px] font-semibold text-slate-500">{new Date(match.matchDate).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
+                      {new Date(match.matchDate).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })} • {new Date(match.matchDate).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}
+                    </span>
                     <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md">
                       {match.status}
                     </span>

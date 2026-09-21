@@ -66,7 +66,9 @@ export const AdminMatchesPage: React.FC = () => {
       data.append('team1Name', formData.team1Name);
       data.append('team2Name', formData.team2Name);
       data.append('league', formData.league);
-      data.append('matchDate', formData.matchDate);
+      // Convert local datetime-local value to ISO UTC string
+      const localDateObj = new Date(formData.matchDate);
+      data.append('matchDate', localDateObj.toISOString());
       data.append('status', formData.status);
       data.append('team1Score', formData.team1Score.toString());
       data.append('team2Score', formData.team2Score.toString());
@@ -98,9 +100,14 @@ export const AdminMatchesPage: React.FC = () => {
   };
 
   const handleEditClick = (match: any) => {
-    // Format date for datetime-local input
+    // Format date for datetime-local input in local timezone
     const d = new Date(match.matchDate);
-    const dateStr = d.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}T${hours}:${minutes}`;
     
     setFormData({
       team1Name: match.team1Name,
