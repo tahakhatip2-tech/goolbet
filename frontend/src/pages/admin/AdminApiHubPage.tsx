@@ -137,8 +137,10 @@ export const AdminApiHubPage: React.FC = () => {
           </>
         }
         minHeight="min-h-[25vh]"
-      >
-        <div className="w-full max-w-lg mx-auto bg-white/30 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/50 shadow-xl mt-2">
+      />
+
+      <div className="sticky top-20 z-50 px-2 md:px-4 -mt-10 mb-6">
+        <div className="w-full max-w-lg mx-auto bg-white/60 backdrop-blur-2xl rounded-2xl p-3 md:p-4 border border-white/50 shadow-xl">
           <div className="grid grid-cols-2 gap-2 md:gap-3 items-end mb-2">
             <div className="relative text-start">
               <label className="block text-[10px] md:text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5 drop-shadow-sm">
@@ -210,9 +212,9 @@ export const AdminApiHubPage: React.FC = () => {
             {loading ? 'جاري الجلب...' : 'تحديث المباريات'}
           </button>
         </div>
-      </HeroSection>
+      </div>
 
-      <div className="container mx-auto px-2 md:px-4 relative z-20 mt-4">
+      <div className="container mx-auto px-2 md:px-4 relative z-20">
 
         {loading ? (
           <div className="flex justify-center items-center h-40">
