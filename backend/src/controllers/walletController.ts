@@ -115,6 +115,7 @@ export const requestWithdrawal = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Get Wallet and Transactions
 export const getWalletBalance = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -127,7 +128,28 @@ export const getWalletBalance = async (req: AuthRequest, res: Response) => {
       take: 20
     });
 
-    res.json({ wallet, transactions });
+    // Calculate dynamic stats from user's transactions
+    const depositAgg = await prisma.walletTransaction.aggregate({
+      _sum: { amount: true },
+      where: { userId, type: 'DEPOSIT', status: 'COMPLETED' }
+    });
+    
+    const withdrawAgg = await prisma.walletTransaction.aggregate({
+      _sum: { amount: true },
+      where: { userId, type: 'WITHDRAWAL', status: 'COMPLETED' }
+    });
+
+    const totalDeposited = depositAgg._sum.amount || 0;
+    const totalWithdrawn = Math.abs(withdrawAgg._sum.amount || 0);
+
+    res.json({ 
+      wallet: {
+        ...wallet,
+        totalDeposited,
+        totalWithdrawn
+      }, 
+      transactions 
+    });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }

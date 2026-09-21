@@ -58,7 +58,8 @@ export const WalletPage: React.FC = () => {
   const [balance, setBalance] = useState(0.00);
   const [lockedBalance, setLockedBalance] = useState(0.00);
   const [bonusBalance, setBonusBalance] = useState(0.00);
-  const [lockedBonusBalance, setLockedBonusBalance] = useState(0.00);
+  const [totalDeposited, setTotalDeposited] = useState(0.00);
+  const [totalWithdrawn, setTotalWithdrawn] = useState(0.00);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [depositMethods, setDepositMethods] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,7 +91,8 @@ export const WalletPage: React.FC = () => {
         setBalance(walletRes.data.wallet.balance);
         setLockedBalance(walletRes.data.wallet.lockedBalance);
         setBonusBalance(walletRes.data.wallet.bonusBalance || 0);
-        setLockedBonusBalance(walletRes.data.wallet.lockedBonusBalance || 0);
+        setTotalDeposited(walletRes.data.wallet.totalDeposited || 0);
+        setTotalWithdrawn(walletRes.data.wallet.totalWithdrawn || 0);
       }
       setTransactions(walletRes.data.transactions || []);
       
@@ -184,23 +186,29 @@ export const WalletPage: React.FC = () => {
       </HeroSection>
       
       <div className="container mx-auto px-4 py-8 mt-2 relative z-20">
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white/40 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/60 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-white/50 transition-all duration-300">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+          <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-white/60 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-white/50 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-lg text-slate-600 mb-2 relative z-10">الرصيد المعلق (في الرهانات)</h2>
-            <div className="text-2xl md:text-4xl font-bold text-slate-700 relative z-10">${lockedBalance.toFixed(2)}</div>
+            <h2 className="text-sm md:text-base text-slate-600 mb-2 relative z-10">معلق (رهانات)</h2>
+            <div className="text-xl md:text-3xl font-bold text-slate-700 relative z-10">${lockedBalance.toFixed(2)}</div>
           </div>
           
-          <div className="bg-white/40 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-blue-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-blue-50/60 transition-all duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/15 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-lg text-blue-600 mb-2 relative z-10 font-bold">رصيد البونص 🎁</h2>
-            <div className="text-2xl md:text-4xl font-bold text-blue-600 relative z-10">${bonusBalance.toFixed(2)}</div>
+          <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-green-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-green-50/60 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/15 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+            <h2 className="text-sm md:text-base text-green-600 mb-2 relative z-10 font-bold">إجمالي الإيداعات</h2>
+            <div className="text-xl md:text-3xl font-bold text-green-600 relative z-10">${totalDeposited.toFixed(2)}</div>
           </div>
 
-          <div className="bg-white/40 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/60 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-white/50 transition-all duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-lg text-slate-500 mb-2 relative z-10">البونص المعلق</h2>
-            <div className="text-2xl md:text-4xl font-bold text-slate-600 relative z-10">${lockedBonusBalance.toFixed(2)}</div>
+          <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-red-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-red-50/60 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+            <h2 className="text-sm md:text-base text-red-500 mb-2 relative z-10">إجمالي السحوبات</h2>
+            <div className="text-xl md:text-3xl font-bold text-red-600 relative z-10">${totalWithdrawn.toFixed(2)}</div>
+          </div>
+          
+          <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-blue-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-blue-50/60 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/15 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+            <h2 className="text-sm md:text-base text-blue-600 mb-2 relative z-10 font-bold">رصيد البونص 🎁</h2>
+            <div className="text-xl md:text-3xl font-bold text-blue-600 relative z-10">${bonusBalance.toFixed(2)}</div>
           </div>
         </div>
 
