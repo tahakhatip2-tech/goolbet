@@ -18,7 +18,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   minHeight = 'min-h-[40vh]',
 }) => {
   return (
-    <section className={`relative flex items-center justify-center ${minHeight} py-3 md:py-5 mb-4 bg-slate-50 border-b border-slate-200/50`}>
+    <section className={`relative z-30 flex items-center justify-center ${minHeight} py-3 md:py-5 mb-4 bg-slate-50 border-b border-slate-200/50`}>
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {/* Background Image - Changed to contain to show completely */}
         <div 
