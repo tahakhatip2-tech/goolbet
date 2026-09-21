@@ -229,14 +229,14 @@ export const AdminApiHubPage: React.FC = () => {
             <p className="text-slate-500">جرب تغيير التاريخ، الدولة، أو الدوري.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
             {displayedFixtures.map((item: any) => {
               const matchDate = new Date(item.fixture.date);
               const isFinished = item.fixture.status.short === 'FT' || item.fixture.status.short === 'PEN' || item.fixture.status.short === 'AET';
               const isLive = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
               
               return (
-              <div key={item.fixture.id} className="bg-white rounded-3xl p-5 shadow-lg border border-slate-100 flex flex-col hover:shadow-xl transition-shadow relative overflow-hidden group">
+              <div key={item.fixture.id} className="bg-white rounded-3xl p-3 md:p-5 shadow-lg border border-slate-100 flex flex-col hover:shadow-xl transition-shadow relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-purple-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div className="flex items-center justify-between mb-3">
