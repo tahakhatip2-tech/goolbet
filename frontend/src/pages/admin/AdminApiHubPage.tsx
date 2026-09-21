@@ -206,7 +206,7 @@ export const AdminApiHubPage: React.FC = () => {
           <button 
             onClick={fetchFixtures}
             disabled={loading || !selectedLeague}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500/80 to-indigo-500/80 hover:from-purple-600 hover:to-indigo-600 backdrop-blur-md text-white border border-white/30 px-4 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 bg-transparent border border-purple-600 hover:bg-purple-50 text-purple-600 px-4 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all disabled:opacity-50"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             {loading ? 'جاري الجلب...' : 'تحديث المباريات'}
