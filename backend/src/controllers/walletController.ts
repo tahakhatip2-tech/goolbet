@@ -1,7 +1,26 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import prisma from '../config/db';
 import { notifyAdmins } from '../utils/notificationUtils';
+
+export const getDepositMethods = async (req: Request, res: Response) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({ where: { key: 'DEPOSIT_METHODS' } });
+    if (!setting || !setting.value) {
+      return res.json([]);
+    }
+    
+    // Parse the JSON string from DB
+    let methods = JSON.parse(setting.value);
+    
+    // Only return active methods to users
+    methods = methods.filter((m: any) => m.isActive);
+    
+    res.json(methods);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error fetching deposit methods' });
+  }
+};
 
 export const requestDeposit = async (req: AuthRequest, res: Response) => {
   try {

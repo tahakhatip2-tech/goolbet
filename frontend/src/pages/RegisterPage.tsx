@@ -15,8 +15,6 @@ export const RegisterPage: React.FC = () => {
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     username: '',
     email: '',
     password: '',
@@ -54,8 +52,6 @@ export const RegisterPage: React.FC = () => {
     try {
       const formattedEmail = formData.email.trim().toLowerCase();
       await api.post('/auth/register', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
         username: formData.username,
         email: formattedEmail,
         password: formData.password
@@ -134,31 +130,6 @@ export const RegisterPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2.5">
-            <div className="grid grid-cols-2 gap-1.5 sm:gap-2.5">
-              <div className="space-y-0.5">
-                <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">الاسم الأول</label>
-                <input 
-                  type="text" 
-                  required
-                  value={formData.firstName}
-                  onChange={e => setFormData({...formData, firstName: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:py-2 text-[10px] sm:text-sm outline-none focus:border-primary focus:bg-white/10 transition-all text-white placeholder-white/30"
-                  placeholder="أحمد"
-                />
-              </div>
-              <div className="space-y-0.5">
-                <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">اسم العائلة</label>
-                <input 
-                  type="text" 
-                  required
-                  value={formData.lastName}
-                  onChange={e => setFormData({...formData, lastName: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:py-2 text-[10px] sm:text-sm outline-none focus:border-primary focus:bg-white/10 transition-all text-white placeholder-white/30"
-                  placeholder="محمد"
-                />
-              </div>
-            </div>
-
             <div className="space-y-0.5">
               <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">اسم المستخدم (Username)</label>
               <input 

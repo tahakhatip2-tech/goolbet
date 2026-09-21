@@ -12,6 +12,7 @@ import { AdminMatchesPage } from './pages/admin/AdminMatchesPage';
 import { AdminTransactionsPage } from './pages/admin/AdminTransactionsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminApiHubPage } from './pages/admin/AdminApiHubPage';
+import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminBetsPage } from './pages/admin/AdminBetsPage';
 import { AdminBonusPage } from './pages/admin/AdminBonusPage';
 import { AdminLeaguesPage } from './pages/admin/AdminLeaguesPage';
@@ -42,6 +43,7 @@ function App() {
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="transactions" element={<AdminTransactionsPage />} />
           <Route path="api-hub" element={<AdminApiHubPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="bets" element={<AdminBetsPage />} />
           <Route path="bonus" element={<AdminBonusPage />} />
           <Route path="leagues" element={<AdminLeaguesPage />} />

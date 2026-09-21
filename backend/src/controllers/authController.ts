@@ -92,7 +92,7 @@ export const telegramLogin = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { password, firstName, lastName } = req.body;
+    const { password } = req.body;
     const email = req.body.email?.trim().toLowerCase();
     const username = req.body.username?.trim().toLowerCase();
     
@@ -115,7 +115,7 @@ export const register = async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'البريد الإلكتروني مستخدم بالفعل' });
       }
       if (existingUser.username === username) {
-        return res.status(400).json({ error: 'اسم المستخدم مستخدم بالفعل' });
+        return res.status(400).json({ error: 'اسم المستخدم مأخوذ، يرجى اختيار اسم آخر' });
       }
     }
 
@@ -126,8 +126,6 @@ export const register = async (req: Request, res: Response) => {
         email,
         username,
         passwordHash,
-        firstName,
-        lastName,
         wallet: {
           create: { balance: 0, lockedBalance: 0 }
         }

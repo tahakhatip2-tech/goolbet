@@ -769,3 +769,38 @@ export const toggleStream = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Server error toggling stream' });
   }
 };
+
+// Settings Management
+export const getSetting = async (req: Request, res: Response) => {
+  try {
+    const key = req.params.key as string;
+    const setting = await prisma.systemSetting.findUnique({ where: { key } });
+    
+    if (!setting) {
+      if (key === 'DEPOSIT_METHODS') {
+         return res.json({ key, value: JSON.stringify([]) });
+      }
+      return res.status(404).json({ error: 'Setting not found' });
+    }
+    res.json(setting);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error fetching setting' });
+  }
+};
+
+export const updateSetting = async (req: Request, res: Response) => {
+  try {
+    const key = req.params.key as string;
+    const { value } = req.body;
+    
+    const setting = await prisma.systemSetting.upsert({
+      where: { key },
+      update: { value: JSON.stringify(value) },
+      create: { key, value: JSON.stringify(value) }
+    });
+    
+    res.json(setting);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error updating setting' });
+  }
+};

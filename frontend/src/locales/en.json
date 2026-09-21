@@ -1,0 +1,47 @@
+{
+  "translation": {
+    "home": {
+      "title": "Welcome to Goolbet",
+      "matches": "Matches",
+      "wallet": "Wallet",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "live": "LIVE",
+      "upcoming": "Upcoming",
+      "finished": "Finished",
+      "bet_now": "Bet Now",
+      "hero_title": "The First Platform for Football",
+      "hero_subtitle": "Follow matches, predict results, and win prizes.",
+      "hero_cta": "Start Now",
+      "all_matches": "All Matches"
+    },
+    "nav": {
+      "home": "Home",
+      "matches": "Matches",
+      "wallet": "Wallet",
+      "admin": "Admin Panel",
+      "login": "Login",
+      "register": "Sign Up",
+      "profile": "Profile",
+      "logout": "Logout"
+    },
+    "wallet": {
+      "title": "My Wallet",
+      "balance": "Main Balance",
+      "bonus": "Bonus Balance",
+      "locked": "Locked Balance",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "transactions": "Recent Transactions"
+    },
+    "common": {
+      "loading": "Loading...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "success": "Success",
+      "error": "Error"
+    }
+  }
+}

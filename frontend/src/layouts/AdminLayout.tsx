@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Footer } from '../components/ui/Footer';
-import { LayoutDashboard, Trophy, Users, Receipt, Target, Menu, LogOut, Gift, MoreHorizontal, ArrowRight, Globe } from 'lucide-react';
+import { LayoutDashboard, Trophy, Users, Receipt, Target, Menu, LogOut, Gift, MoreHorizontal, ArrowRight, Globe, Settings } from 'lucide-react';
 import api from '../api/axios';
 import { NotificationDropdown } from '../components/ui/NotificationDropdown';
 
@@ -67,11 +67,12 @@ export const AdminLayout: React.FC = () => {
     { name: 'الرهانات', path: '/admin/bets', icon: Target },
     { name: 'البونص', path: '/admin/bonus', icon: Gift },
     { name: 'استيراد المباريات', path: '/admin/api-hub', icon: Globe },
-    { name: 'الدوريات', path: '/admin/leagues', icon: Trophy }
+    { name: 'الدوريات', path: '/admin/leagues', icon: Trophy },
+    { name: 'الإعدادات', path: '/admin/settings', icon: Settings }
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Background Ambience */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background -z-20 pointer-events-none"></div>
 
@@ -103,8 +104,8 @@ export const AdminLayout: React.FC = () => {
 
             <div className="flex items-center gap-2 md:gap-4">
               <NotificationDropdown />
-              <Button variant="ghost" className="hidden md:inline-flex" onClick={toggleLanguage}>
-                {i18n.language === 'ar' ? 'English' : 'العربية'}
+              <Button variant="ghost" className="px-2" onClick={toggleLanguage}>
+                {i18n.language === 'ar' ? 'EN' : 'عربي'}
               </Button>
               
               <div className="relative" ref={dropdownRef}>

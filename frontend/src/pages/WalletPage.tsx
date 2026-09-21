@@ -59,6 +59,7 @@ export const WalletPage: React.FC = () => {
   const [bonusBalance, setBonusBalance] = useState(0.00);
   const [lockedBonusBalance, setLockedBonusBalance] = useState(0.00);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [depositMethods, setDepositMethods] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -68,7 +69,7 @@ export const WalletPage: React.FC = () => {
   
   // Deposit state
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositMethod] = useState('USDT TRC-20');
+  const [depositMethod, setDepositMethod] = useState('');
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
 
@@ -79,14 +80,23 @@ export const WalletPage: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const res = await api.get('/wallet');
-      if (res.data && res.data.wallet) {
-        setBalance(res.data.wallet.balance);
-        setLockedBalance(res.data.wallet.lockedBalance);
-        setBonusBalance(res.data.wallet.bonusBalance || 0);
-        setLockedBonusBalance(res.data.wallet.lockedBonusBalance || 0);
+      const [walletRes, methodsRes] = await Promise.all([
+        api.get('/wallet'),
+        api.get('/wallet/deposit-methods')
+      ]);
+      
+      if (walletRes.data && walletRes.data.wallet) {
+        setBalance(walletRes.data.wallet.balance);
+        setLockedBalance(walletRes.data.wallet.lockedBalance);
+        setBonusBalance(walletRes.data.wallet.bonusBalance || 0);
+        setLockedBonusBalance(walletRes.data.wallet.lockedBonusBalance || 0);
       }
-      setTransactions(res.data.transactions || []);
+      setTransactions(walletRes.data.transactions || []);
+      
+      if (methodsRes.data && methodsRes.data.length > 0) {
+        setDepositMethods(methodsRes.data);
+        setDepositMethod(methodsRes.data[0].name); // Select first by default
+      }
     } catch (error) {
       console.error('Failed to fetch wallet data:', error);
     } finally {
@@ -203,13 +213,39 @@ export const WalletPage: React.FC = () => {
               </button>
             </div>
             <div className="p-6 overflow-y-auto custom-scrollbar">
-              <div className="bg-blue-50/50 p-4 rounded-xl mb-6 font-mono text-sm border border-blue-100">
-                <p className="text-slate-500 mb-2 font-sans font-medium text-xs">عنوان الإيداع (USDT TRC-20):</p>
-                <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                  <span className="truncate break-all text-slate-700 font-bold">T9yD14Nj9j7xAB4dbGeiX9h8iVvK9jxyz1</span>
-                  <Button variant="outline" className="h-8 px-3 ml-4 bg-slate-50 hover:bg-slate-100 text-xs" onClick={() => navigator.clipboard.writeText('T9yD14Nj9j7xAB4dbGeiX9h8iVvK9jxyz1')}>نسخ</Button>
+              {depositMethods.length > 0 ? (
+                <div className="mb-6 space-y-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-bold text-slate-700">طريقة الإيداع</label>
+                    <select 
+                      value={depositMethod} 
+                      onChange={e => setDepositMethod(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary transition-all text-sm font-bold text-slate-700"
+                    >
+                      {depositMethods.map((m: any) => (
+                        <option key={m.id} value={m.name}>{m.name} {m.network ? `(${m.network})` : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {depositMethods.filter(m => m.name === depositMethod).map(method => (
+                    <div key={method.id} className="bg-blue-50/50 p-4 rounded-xl font-mono text-sm border border-blue-100 animate-in fade-in">
+                      <p className="text-slate-500 mb-2 font-sans font-medium text-xs">عنوان المحفظة / الرابط:</p>
+                      <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                        <span className="truncate break-all text-slate-700 font-bold max-w-[70%]">{method.address}</span>
+                        <Button type="button" variant="outline" className="h-8 px-3 ml-2 bg-slate-50 hover:bg-slate-100 text-xs" onClick={() => {
+                          navigator.clipboard.writeText(method.address);
+                          toast.success('تم النسخ بنجاح');
+                        }}>نسخ</Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="p-4 mb-6 text-center text-amber-600 bg-amber-50 rounded-xl border border-amber-200 text-sm font-medium">
+                  لا توجد طرق إيداع متاحة حالياً، يرجى التواصل مع الدعم.
+                </div>
+              )}
               <form onSubmit={handleDepositSubmit} className="space-y-5">
                 <div>
                   <label className="block mb-2 text-sm font-bold text-slate-700">المبلغ (USD)</label>
