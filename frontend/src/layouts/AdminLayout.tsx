@@ -146,6 +146,10 @@ export const AdminLayout: React.FC = () => {
                         <Globe size={18} className="text-primary" />
                         استيراد المباريات
                       </Link>
+                      <Link to="/admin/settings" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 text-sm font-medium transition-colors text-slate-700">
+                        <Settings size={18} className="text-primary" />
+                        الإعدادات
+                      </Link>
                       <div className="h-px bg-border/50 my-1"></div>
                       <Link to="/" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 text-sm font-medium transition-colors text-slate-700">
                         <ArrowRight size={18} className="text-primary" />
