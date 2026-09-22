@@ -36,16 +36,24 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
     }
 
     // Upload receipt to Supabase Storage so it's accessible from any device/network
-    let receiptUrl: string;
+    let receiptUrl: string | undefined;
+    let receiptImage: string | undefined;
+    const localPath = req.file.path;
+    const filename = req.file.filename;
+    const mimetype = req.file.mimetype;
+
     try {
       receiptUrl = await uploadFileToSupabase(
-        req.file.path,
-        `receipts/${req.file.filename}`,
-        req.file.mimetype
+        localPath,
+        `receipts/${filename}`,
+        mimetype
       );
-    } finally {
-      // Always clean up local temp file
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      // Clean up local temp file after successful Supabase upload
+      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+    } catch (uploadErr) {
+      // Supabase upload failed — keep the local file as fallback
+      console.warn('Supabase upload failed, keeping local file:', uploadErr);
+      receiptImage = filename; // store filename for local /uploads serving
     }
 
     const transaction = await prisma.walletTransaction.create({
@@ -54,7 +62,7 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
         type: 'DEPOSIT',
         amount: Number(amount),
         status: 'PENDING',
-        details: JSON.stringify({ method, receiptUrl })
+        details: JSON.stringify({ method, receiptUrl, receiptImage })
       }
     });
 

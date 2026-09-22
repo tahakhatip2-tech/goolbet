@@ -101,14 +101,26 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
             <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
               <div className="px-3 py-2 border-b border-slate-50 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">صورة الإيصال</span>
-                <button onClick={() => setImgOpen(true)} className="text-[10px] text-blue-500 hover:text-blue-700 flex items-center gap-1">
+                <a href={receiptUrl} target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:text-blue-700 flex items-center gap-1">
                   <ExternalLink size={10} /> عرض كامل
-                </button>
+                </a>
               </div>
               <img
                 src={receiptUrl}
                 alt="الإيصال"
                 onClick={() => setImgOpen(true)}
+                onError={(e) => {
+                  const t = e.currentTarget;
+                  t.onerror = null;
+                  t.style.display = 'none';
+                  const parent = t.parentElement;
+                  if (parent) {
+                    const msg = document.createElement('div');
+                    msg.className = 'flex flex-col items-center justify-center h-24 text-slate-300 gap-1';
+                    msg.innerHTML = '<span style="font-size:24px">🖼️</span><span style="font-size:11px">لا يمكن تحميل الصورة</span>';
+                    parent.appendChild(msg);
+                  }
+                }}
                 className="w-full h-40 object-cover cursor-zoom-in hover:opacity-90 transition-opacity"
               />
             </div>
