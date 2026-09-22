@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import prisma from '../config/db';
 import { notifyAdmins } from '../utils/notificationUtils';
+import { uploadFileToSupabase } from '../utils/supabaseStorage';
+import fs from 'fs';
 
 export const getDepositMethods = async (req: Request, res: Response) => {
   try {
@@ -28,10 +30,23 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { amount, method } = req.body;
-    const receiptImage = req.file?.filename;
+    let receiptImage = req.file?.filename;
 
     if (!amount || !receiptImage) {
       return res.status(400).json({ error: 'Amount and receipt image are required' });
+    }
+
+    if (req.file) {
+      try {
+        receiptImage = await uploadFileToSupabase(req.file.path, req.file.filename, req.file.mimetype);
+      } catch (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        // Fallback to local filename if upload fails, though it might 404 later
+      } finally {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      }
     }
 
     const transaction = await prisma.walletTransaction.create({

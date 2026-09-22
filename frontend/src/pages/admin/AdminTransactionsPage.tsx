@@ -13,7 +13,7 @@ const TransactionCard: React.FC<{ tx: any; onProcess: (id: string, action: 'APPR
     details = { method: tx.details };
   }
   const isProcessing = processingId === tx.id;
-  const receiptUrl = details.receiptImage ? `http://localhost:5000/uploads/${details.receiptImage}` : null;
+  const receiptUrl = details.receiptImage ? (details.receiptImage.startsWith('http') ? details.receiptImage : `http://localhost:5000/uploads/${details.receiptImage}`) : null;
 
   return (
     <>
@@ -349,7 +349,7 @@ export const AdminTransactionsPage: React.FC = () => {
                             <span className="text-[10px] text-slate-400 truncate max-w-[160px]">{details.address.slice(0, 20)}...</span>
                           )}
                           {tx.type === 'DEPOSIT' && details.receiptImage && (
-                            <a href={`http://localhost:5000/uploads/${details.receiptImage}`} target="_blank" rel="noreferrer"
+                            <a href={details.receiptImage.startsWith('http') ? details.receiptImage : `http://localhost:5000/uploads/${details.receiptImage}`} target="_blank" rel="noreferrer"
                               className="inline-flex items-center gap-1 text-blue-500 hover:text-blue-700 text-xs bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-lg w-fit">
                               <ExternalLink size={11} /> عرض الإيصال
                             </a>
