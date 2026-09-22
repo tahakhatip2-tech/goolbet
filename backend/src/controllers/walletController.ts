@@ -30,23 +30,22 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { amount, method } = req.body;
-    let receiptImage = req.file?.filename;
 
-    if (!amount || !receiptImage) {
+    if (!amount || !req.file) {
       return res.status(400).json({ error: 'Amount and receipt image are required' });
     }
 
-    if (req.file) {
-      try {
-        receiptImage = await uploadFileToSupabase(req.file.path, req.file.filename, req.file.mimetype);
-      } catch (uploadError) {
-        console.error('Supabase upload error:', uploadError);
-        // Fallback to local filename if upload fails, though it might 404 later
-      } finally {
-        if (fs.existsSync(req.file.path)) {
-          fs.unlinkSync(req.file.path);
-        }
-      }
+    // Upload receipt to Supabase Storage so it's accessible from any device/network
+    let receiptUrl: string;
+    try {
+      receiptUrl = await uploadFileToSupabase(
+        req.file.path,
+        `receipts/${req.file.filename}`,
+        req.file.mimetype
+      );
+    } finally {
+      // Always clean up local temp file
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     }
 
     const transaction = await prisma.walletTransaction.create({
@@ -55,7 +54,7 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
         type: 'DEPOSIT',
         amount: Number(amount),
         status: 'PENDING',
-        details: JSON.stringify({ method, receiptImage })
+        details: JSON.stringify({ method, receiptUrl })
       }
     });
 
