@@ -35,7 +35,7 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Amount and receipt image are required' });
     }
 
-    // Upload receipt to Supabase Storage so it's accessible from any device/network
+    // Upload receipt to Supabase Storage (accessible from any device/network)
     let receiptUrl: string | undefined;
     let receiptImage: string | undefined;
     const localPath = req.file.path;
@@ -50,10 +50,16 @@ export const requestDeposit = async (req: AuthRequest, res: Response) => {
       );
       // Clean up local temp file after successful Supabase upload
       if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+      console.log('✅ Receipt uploaded to Supabase:', receiptUrl);
     } catch (uploadErr) {
-      // Supabase upload failed — keep the local file as fallback
-      console.warn('Supabase upload failed, keeping local file:', uploadErr);
-      receiptImage = filename; // store filename for local /uploads serving
+      console.error('❌ Supabase receipt upload failed:', uploadErr);
+      if (process.env.VERCEL) {
+        // On Vercel, there is NO persistent local storage — Supabase is mandatory
+        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+        return res.status(500).json({ error: 'فشل رفع صورة الإيصال. يرجى المحاولة مرة أخرى.' });
+      }
+      // On local dev: keep the file and store filename as fallback
+      receiptImage = filename;
     }
 
     const transaction = await prisma.walletTransaction.create({

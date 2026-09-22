@@ -34,6 +34,10 @@ export async function uploadFileToSupabase(
   fileName: string,
   mimeType: string
 ): Promise<string> {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    throw new Error('Supabase env vars missing: SUPABASE_URL or SUPABASE_SECRET_KEY not set on the server.');
+  }
+
   const fileBuffer = fs.readFileSync(localPath);
 
   const { error } = await supabase.storage
