@@ -98,7 +98,7 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:end-0 top-[72px] sm:top-full sm:mt-2 sm:w-80 max-w-full bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200 sm:origin-top-end origin-top">
+        <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:end-0 top-[72px] sm:top-full sm:mt-2 sm:w-80 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200 sm:origin-top-end origin-top">
           <div className="p-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
             <h3 className="font-bold text-slate-800">الإشعارات</h3>
             {unreadCount > 0 && (
