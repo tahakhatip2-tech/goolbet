@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyAcademy, updateMyAcademy } from '../../api/academies';
 import { Save, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { BackendImage } from '../../components/BackendImage';
 
 export const AcademySettingsPage: React.FC = () => {
   const { showToast } = useToast();
@@ -91,7 +92,7 @@ export const AcademySettingsPage: React.FC = () => {
                 <ImageIcon size={18} /> شعار الأكاديمية
               </label>
               {academy?.logo && (
-                <img src={academy.logo} alt="Logo" className="w-24 h-24 rounded-xl object-cover mb-4 border border-gray-600" />
+                <BackendImage src={academy.logo} alt="Logo" className="w-24 h-24 rounded-xl object-cover mb-4 border border-gray-600" />
               )}
               <input type="file" name="logo" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
             </div>
@@ -101,7 +102,7 @@ export const AcademySettingsPage: React.FC = () => {
                 <ImageIcon size={18} /> صورة الغلاف
               </label>
               {academy?.coverImage && (
-                <img src={academy.coverImage} alt="Cover" className="w-full h-24 rounded-xl object-cover mb-4 border border-gray-600" />
+                <BackendImage src={academy.coverImage} alt="Cover" className="w-full h-24 rounded-xl object-cover mb-4 border border-gray-600" />
               )}
               <input type="file" name="coverImage" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
             </div>
