@@ -47,13 +47,11 @@ export const updateMyAcademy = async (req: AuthRequest, res: Response) => {
 
     if (files?.logo?.[0]) {
       const f = files.logo[0];
-      try { logo = await uploadFile(f.path, f.filename, f.mimetype); }
-      finally { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); }
+      logo = await uploadFile(f.path, f.filename, f.mimetype);
     }
     if (files?.coverImage?.[0]) {
       const f = files.coverImage[0];
-      try { coverImage = await uploadFile(f.path, f.filename, f.mimetype); }
-      finally { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); }
+      coverImage = await uploadFile(f.path, f.filename, f.mimetype);
     }
 
     const academy = await prisma.academy.update({

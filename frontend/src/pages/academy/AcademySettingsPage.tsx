@@ -8,6 +8,8 @@ import { BackendImage } from '../../components/BackendImage';
 export const AcademySettingsPage: React.FC = () => {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const [logoPreview, setLogoPreview] = React.useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = React.useState<string | null>(null);
 
   const { data: academy, isLoading } = useQuery({
     queryKey: ['myAcademy'],
@@ -19,9 +21,20 @@ export const AcademySettingsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myAcademy'] });
       showToast('success', 'تم تحديث الإعدادات بنجاح');
+      setLogoPreview(null);
+      setCoverPreview(null);
     },
     onError: () => showToast('error', 'حدث خطأ أثناء التحديث')
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'cover') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      if (type === 'logo') setLogoPreview(url);
+      else setCoverPreview(url);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,20 +104,20 @@ export const AcademySettingsPage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-300 mb-4 flex items-center gap-2">
                 <ImageIcon size={18} /> شعار الأكاديمية
               </label>
-              {academy?.logo && (
-                <BackendImage src={academy.logo} alt="Logo" className="w-24 h-24 rounded-xl object-cover mb-4 border border-gray-600" />
+              {(logoPreview || academy?.logo) && (
+                <BackendImage src={logoPreview || academy.logo} alt="Logo" className="w-24 h-24 rounded-xl object-cover mb-4 border border-gray-600 bg-white" />
               )}
-              <input type="file" name="logo" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
+              <input type="file" name="logo" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-4 flex items-center gap-2">
                 <ImageIcon size={18} /> صورة الغلاف
               </label>
-              {academy?.coverImage && (
-                <BackendImage src={academy.coverImage} alt="Cover" className="w-full h-24 rounded-xl object-cover mb-4 border border-gray-600" />
+              {(coverPreview || academy?.coverImage) && (
+                <BackendImage src={coverPreview || academy.coverImage} alt="Cover" className="w-full h-24 rounded-xl object-cover mb-4 border border-gray-600 bg-gray-800" />
               )}
-              <input type="file" name="coverImage" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
+              <input type="file" name="coverImage" accept="image/*" onChange={(e) => handleFileChange(e, 'cover')} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600" />
             </div>
           </div>
 

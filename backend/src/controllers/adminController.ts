@@ -130,13 +130,11 @@ export const adminCreateStream = async (req: Request, res: Response) => {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       if (files['team1Logo']?.[0]) {
         const f = files['team1Logo'][0];
-        team1Logo = await uploadFile(f.path, f.originalname, f.mimetype);
-        fs.unlink(f.path, () => {});
+        team1Logo = await uploadFile(f.path, f.filename, f.mimetype);
       }
       if (files['team2Logo']?.[0]) {
         const f = files['team2Logo'][0];
-        team2Logo = await uploadFile(f.path, f.originalname, f.mimetype);
-        fs.unlink(f.path, () => {});
+        team2Logo = await uploadFile(f.path, f.filename, f.mimetype);
       }
     }
 
