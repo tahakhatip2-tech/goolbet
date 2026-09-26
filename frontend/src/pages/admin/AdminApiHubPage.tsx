@@ -66,10 +66,22 @@ export const AdminApiHubPage: React.FC = () => {
       
       let fetchedFixtures = res.data || [];
       
-      // If current season returned 0 matches (API hasn't populated it yet), fallback to 2024
+      // If current season returned 0 matches, fallback to 2024
       if (fetchedFixtures.length === 0 && currentSeason > 2024) {
         console.log(`Season ${currentSeason} has 0 matches, falling back to 2024...`);
         url = `/admin/api-football/fixtures?league=${selectedLeague.league.id}&season=2024`;
+        try {
+          res = await api.get(url);
+          fetchedFixtures = res.data || [];
+        } catch (e) {
+          fetchedFixtures = [];
+        }
+      }
+
+      // Final fallback to 2023 if 2024 is also empty
+      if (fetchedFixtures.length === 0) {
+        console.log(`Falling back to 2023...`);
+        url = `/admin/api-football/fixtures?league=${selectedLeague.league.id}&season=2023`;
         try {
           res = await api.get(url);
           fetchedFixtures = res.data || [];
@@ -196,7 +208,7 @@ export const AdminApiHubPage: React.FC = () => {
                 type="text" 
                 value={teamSearch}
                 onChange={(e) => setTeamSearch(e.target.value)}
-                placeholder="اسم الفريق..."
+                placeholder="اسم الفريق (باللغة الانجليزية)..."
                 disabled={fixtures.length === 0}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-slate-900 font-bold disabled:opacity-50 placeholder:text-slate-400"
               />

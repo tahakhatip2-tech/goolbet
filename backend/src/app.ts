@@ -11,6 +11,7 @@ import walletRoutes from './routes/walletRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import chatRoutes from './routes/chatRoutes';
 import tournamentRoutes from './routes/tournamentRoutes';
+import apiFootballRoutes from './routes/apiFootballRoutes';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/tournaments', tournamentRoutes);
+app.use('/api/admin/api-football', apiFootballRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
