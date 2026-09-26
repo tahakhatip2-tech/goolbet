@@ -169,18 +169,15 @@ export const createStream = async (req: AuthRequest, res: Response) => {
 
     if (files?.thumbnail?.[0]) {
       const f = files.thumbnail[0];
-      try { thumbnailUrl = await uploadFile(f.path, f.filename, f.mimetype); }
-      finally { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); }
+      thumbnailUrl = await uploadFile(f.path, f.filename, f.mimetype);
     }
     if (files?.team1Logo?.[0]) {
       const f = files.team1Logo[0];
-      try { team1Logo = await uploadFile(f.path, f.filename, f.mimetype); }
-      finally { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); }
+      team1Logo = await uploadFile(f.path, f.filename, f.mimetype);
     }
     if (files?.team2Logo?.[0]) {
       const f = files.team2Logo[0];
-      try { team2Logo = await uploadFile(f.path, f.filename, f.mimetype); }
-      finally { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); }
+      team2Logo = await uploadFile(f.path, f.filename, f.mimetype);
     }
 
     const stream = await prisma.stream.create({

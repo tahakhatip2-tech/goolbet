@@ -53,6 +53,18 @@ export const createStream = async (formData: FormData) => {
   return data;
 };
 
+export const updateStream = async (id: string, formData: FormData) => {
+  const { data } = await api.put(`/academies/my/streams/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return data;
+};
+
+export const deleteStream = async (id: string) => {
+  const { data } = await api.delete(`/academies/my/streams/${id}`);
+  return data;
+};
+
 export const getAcademyStats = async () => {
   const { data } = await api.get('/academies/my/stats');
   return data;

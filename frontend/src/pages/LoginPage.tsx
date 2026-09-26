@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { login, telegramLogin } from '../api/auth';
-import { Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
 import type { TelegramUser } from '../components/TelegramLoginWidget';
@@ -230,6 +230,17 @@ export const LoginPage: React.FC = () => {
           <p className="text-center text-[10px] sm:text-xs text-white/60 mt-2 sm:mt-3">
             {t('auth.no_account')} <Link to="/register" className="font-bold text-primary hover:text-white transition-all">{t('auth.register_link')}</Link>
           </p>
+
+          {/* Academy Button */}
+          <div className="mt-2 pt-2 border-t border-white/5">
+            <Link
+              to="/register-academy"
+              className="flex items-center justify-center gap-2 w-full py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 hover:from-purple-600/35 hover:to-blue-600/35 border border-purple-500/30 hover:border-purple-400/50 text-purple-300 hover:text-white transition-all duration-200 group"
+            >
+              <Shield size={14} className="group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-xs font-bold tracking-wide">تسجيل الدخول كمركز رياضي / أكاديمية</span>
+            </Link>
+          </div>
         </div>
         
         {/* Version Info */}

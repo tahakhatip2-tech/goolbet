@@ -8,6 +8,15 @@ export const AcademyLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+
+  React.useEffect(() => {
+    if (!user || user.role !== 'ACADEMY') {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
