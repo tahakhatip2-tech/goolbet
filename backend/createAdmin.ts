@@ -4,48 +4,26 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'tahakhatip@gmail.com';
-  const password = 'taha@1982';
-
-  // Check if admin already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email }
-  });
-
-  if (existingUser) {
-    console.log('Admin user already exists!');
-    // Just update the role and password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await prisma.user.update({
-      where: { email },
-      data: {
-        passwordHash: hashedPassword,
-        role: 'ADMIN'
-      }
-    });
-    console.log('Updated existing user to ADMIN with new password.');
-    return;
-  }
-
-  // Create new admin
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: {
+  const passwordHash = await bcrypt.hash('taha@1982', 10);
+  const email = 'tahakhatip2@gmail.com';
+  
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {
+      passwordHash,
+      role: 'ADMIN'
+    },
+    create: {
       email,
-      passwordHash: hashedPassword,
-      firstName: 'Admin',
-      lastName: 'Taha',
+      username: 'admin_taha',
+      firstName: 'Taha',
+      lastName: 'Admin',
+      passwordHash,
       role: 'ADMIN',
-      wallet: {
-        create: {
-          balance: 0,
-          lockedBalance: 0
-        }
-      }
+      wallet: { create: { balance: 0, lockedBalance: 0 } }
     }
   });
-
-  console.log('Admin account created successfully:', user.email);
+  console.log('Admin user successfully created/updated:', user.email, 'with role:', user.role);
 }
 
 main()
