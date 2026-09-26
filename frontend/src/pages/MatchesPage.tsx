@@ -142,12 +142,22 @@ export const MatchesPage: React.FC = () => {
                 </span>
               </div>
               
-              {/* League Badge */}
-              <div className="absolute top-4 left-4 z-10">
+              {/* League & Source Badge */}
+              <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
                 <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 text-amber-600 text-xs font-bold gap-1.5 shadow-sm">
                   <Trophy size={12} />
-                  {match.league || 'بطولة'}
+                  {match.league || match.academy?.name || 'بطولة'}
                 </span>
+                {/* Admin vs Academy Badge */}
+                {match.isAdminMatch ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 border border-purple-300 text-purple-700 text-[10px] font-bold">
+                    🏆 مباراة رسمية
+                  </span>
+                ) : match.academy ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 border border-blue-300 text-blue-700 text-[10px] font-bold">
+                    🏫 {match.academy.name}
+                  </span>
+                ) : null}
               </div>
 
               {/* Teams & Score / Title Area */}

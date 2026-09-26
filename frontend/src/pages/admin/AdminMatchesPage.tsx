@@ -463,23 +463,33 @@ export const AdminMatchesPage: React.FC = () => {
               </span>
             </div>
             
-            {/* League Badge */}
-            <div className="absolute top-4 left-4 z-10">
+            {/* League Badge - LEFT */}
+            <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
               <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-amber-400" title={match.league}>
                 <Trophy size={14} />
               </span>
+              {/* Academy or Admin Badge */}
+              {match.isAdminMatch ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 text-[10px] font-bold whitespace-nowrap">
+                  🏆 رسمية
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-300 text-[10px] font-bold whitespace-nowrap">
+                  🏫 أكاديمية
+                </span>
+              )}
             </div>
 
             {/* Teams & Score Area */}
             <div className="pt-12 pb-6 px-6 relative z-10 flex-1">
               <div className="text-center mb-6">
-                <p className="text-xs text-muted-foreground font-medium mb-1">{match.league}</p>
+                <p className="text-xs text-muted-foreground font-medium mb-1">{match.league || match.academy?.name || '—'}</p>
                 <div className="flex items-center justify-center gap-1.5 text-xs text-slate-900/70">
                   <CalendarDays size={12} />
-                  <span>{new Date(match.matchDate).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })}</span>
+                  <span>{new Date(match.scheduledAt || match.matchDate || match.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })}</span>
                   <span className="mx-1">•</span>
                   <Clock size={12} />
-                  <span>{new Date(match.matchDate).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                  <span>{new Date(match.scheduledAt || match.matchDate || match.createdAt).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
               </div>
 

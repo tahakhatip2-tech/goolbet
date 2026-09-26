@@ -93,6 +93,7 @@ model Stream {
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  isAdminMatch Boolean       @default(false)
   academy      Academy       @relation(fields: [academyId], references: [id], onDelete: Cascade)
   bets         Bet[]
   odds         Odds[]

@@ -91,10 +91,37 @@ export const adminCreateStream = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'الفريق الأول والثاني والتاريخ مطلوبون' });
     }
 
-    // get first verified academy or first academy
-    let academy = await prisma.academy.findFirst({ where: { isVerified: true } });
-    if (!academy) academy = await prisma.academy.findFirst();
-    if (!academy) return res.status(400).json({ error: 'لا توجد أكاديمية متاحة. يرجى إنشاء أكاديمية أولاً.' });
+    // ── Find or create the "GoolBet Platform" system academy ──
+    let academy = await prisma.academy.findFirst({ where: { name: 'GoolBet Platform' } });
+
+    if (!academy) {
+      // Try to get or create a system user for admin matches
+      let systemUser = await prisma.user.findFirst({ where: { email: 'platform@goolbet.app' } });
+      if (!systemUser) {
+        const bcrypt = require('bcryptjs');
+        const hash = await bcrypt.hash('platform_system_2024!', 10);
+        systemUser = await prisma.user.create({
+          data: {
+            email: 'platform@goolbet.app',
+            username: 'goolbet_platform',
+            firstName: 'GoolBet',
+            lastName: 'Platform',
+            passwordHash: hash,
+            role: 'ACADEMY',
+            wallet: { create: { balance: 0, lockedBalance: 0 } }
+          }
+        });
+      }
+      academy = await prisma.academy.create({
+        data: {
+          userId: systemUser.id,
+          name: 'GoolBet Platform',
+          description: 'مباريات المنصة الرسمية',
+          isVerified: true,
+          isActive: true,
+        }
+      });
+    }
 
     let team1Logo: string | null = null;
     let team2Logo: string | null = null;
@@ -131,6 +158,7 @@ export const adminCreateStream = async (req: Request, res: Response) => {
         team2Score: 0,
         streamUrl: streamUrl || null,
         isStreamActive: isStreamActive === 'true',
+        isAdminMatch: true,  // ← علامة مباراة الإدارة
         odds: { create: { team1Win: parsedOdds.team1Win, draw: parsedOdds.draw, team2Win: parsedOdds.team2Win } }
       },
       include: { odds: true, academy: { select: { id: true, name: true } } }
