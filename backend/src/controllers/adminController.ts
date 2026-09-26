@@ -83,6 +83,66 @@ export const toggleAcademyStatus = async (req: Request, res: Response) => {
 
 // ─── Streams Management (Admin) ───────────────────────────────────────────────
 
+export const adminCreateStream = async (req: Request, res: Response) => {
+  try {
+    const { team1Name, team2Name, league, matchDate, status, odds, streamUrl, isStreamActive } = req.body;
+
+    if (!team1Name || !team2Name || !matchDate) {
+      return res.status(400).json({ error: 'الفريق الأول والثاني والتاريخ مطلوبون' });
+    }
+
+    // get first verified academy or first academy
+    let academy = await prisma.academy.findFirst({ where: { isVerified: true } });
+    if (!academy) academy = await prisma.academy.findFirst();
+    if (!academy) return res.status(400).json({ error: 'لا توجد أكاديمية متاحة. يرجى إنشاء أكاديمية أولاً.' });
+
+    let team1Logo: string | null = null;
+    let team2Logo: string | null = null;
+
+    if (req.files) {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      if (files['team1Logo']?.[0]) {
+        const f = files['team1Logo'][0];
+        team1Logo = await uploadFile(f.path, f.originalname, f.mimetype);
+        fs.unlink(f.path, () => {});
+      }
+      if (files['team2Logo']?.[0]) {
+        const f = files['team2Logo'][0];
+        team2Logo = await uploadFile(f.path, f.originalname, f.mimetype);
+        fs.unlink(f.path, () => {});
+      }
+    }
+
+    let parsedOdds = { team1Win: 1.5, draw: 3.0, team2Win: 2.5 };
+    try { if (odds) parsedOdds = JSON.parse(odds); } catch {}
+
+    const stream = await prisma.stream.create({
+      data: {
+        academyId: academy.id,
+        title: `${team1Name} vs ${team2Name}`,
+        streamType: 'MATCH',
+        status: (status as any) || 'SCHEDULED',
+        scheduledAt: new Date(matchDate),
+        team1Name,
+        team1Logo,
+        team1Score: 0,
+        team2Name,
+        team2Logo,
+        team2Score: 0,
+        streamUrl: streamUrl || null,
+        isStreamActive: isStreamActive === 'true',
+        odds: { create: { team1Win: parsedOdds.team1Win, draw: parsedOdds.draw, team2Win: parsedOdds.team2Win } }
+      },
+      include: { odds: true, academy: { select: { id: true, name: true } } }
+    });
+
+    res.status(201).json(stream);
+  } catch (error: any) {
+    console.error('adminCreateStream error:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+};
+
 export const getAllStreams = async (_req: Request, res: Response) => {
   try {
     const streams = await prisma.stream.findMany({

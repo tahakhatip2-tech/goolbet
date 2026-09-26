@@ -34,7 +34,7 @@ export const AdminMatchesPage: React.FC = () => {
 
   const fetchMatches = async () => {
     try {
-      const res = await api.get('/matches');
+      const res = await api.get('/admin/streams');
       setMatches(res.data);
     } catch (error) {
       console.error('Error fetching matches', error);

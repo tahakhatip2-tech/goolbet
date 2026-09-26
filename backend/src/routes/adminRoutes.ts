@@ -5,7 +5,7 @@ import {
   getStats,
   getUsers, toggleUserStatus, manageWallet, manageBonus,
   getAcademies, verifyAcademy, toggleAcademyStatus,
-  getAllStreams, getStreamBets, settleStream, adminUpdateStream, adminDeleteStream,
+  adminCreateStream, getAllStreams, getStreamBets, settleStream, adminUpdateStream, adminDeleteStream,
   getAllBets,
   getPendingTransactions, getTransactionStats, getPendingTransactionsCount, processTransaction,
   getSetting, updateSetting,
@@ -23,12 +23,16 @@ router.get('/academies', ...adminAuth, getAcademies);
 router.put('/academies/:id/verify', ...adminAuth, verifyAcademy);
 router.put('/academies/:id/toggle', ...adminAuth, toggleAcademyStatus);
 
-// Streams
+// Streams / Matches
 router.get('/streams', ...adminAuth, getAllStreams);
+router.get('/matches', ...adminAuth, getAllStreams);
+router.post('/matches', ...adminAuth, upload.fields([{ name: 'team1Logo', maxCount: 1 }, { name: 'team2Logo', maxCount: 1 }]), adminCreateStream);
 router.get('/streams/:id/bets', ...adminAuth, getStreamBets);
 router.post('/streams/:id/settle', ...adminAuth, settleStream);
 router.put('/streams/:id', ...adminAuth, adminUpdateStream);
+router.put('/matches/:id', ...adminAuth, upload.fields([{ name: 'team1Logo', maxCount: 1 }, { name: 'team2Logo', maxCount: 1 }]), adminUpdateStream);
 router.delete('/streams/:id', ...adminAuth, adminDeleteStream);
+router.delete('/matches/:id', ...adminAuth, adminDeleteStream);
 
 // Bets
 router.get('/bets', ...adminAuth, getAllBets);
