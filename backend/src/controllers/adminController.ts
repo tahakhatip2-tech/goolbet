@@ -143,12 +143,16 @@ export const adminCreateStream = async (req: Request, res: Response) => {
     let parsedOdds = { team1Win: 1.5, draw: 3.0, team2Win: 2.5 };
     try { if (odds) parsedOdds = JSON.parse(odds); } catch {}
 
+    // Map frontend status values to valid StreamStatus enum values
+    const validStatuses = ['DRAFT', 'SCHEDULED', 'LIVE', 'ENDED', 'CANCELLED'];
+    const mappedStatus = (status === 'UPCOMING' || !validStatuses.includes(status)) ? 'SCHEDULED' : status;
+
     const stream = await prisma.stream.create({
       data: {
         academyId: academy.id,
         title: `${team1Name} vs ${team2Name}`,
         streamType: 'MATCH',
-        status: (status as any) || 'SCHEDULED',
+        status: mappedStatus as any,
         scheduledAt: new Date(matchDate),
         team1Name,
         team1Logo,

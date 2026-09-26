@@ -20,7 +20,7 @@ export const AdminMatchesPage: React.FC = () => {
   const [cameraBroadcastMatch, setCameraBroadcastMatch] = useState<any | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    team1Name: '', team2Name: '', league: '', matchDate: '', status: 'UPCOMING',
+    team1Name: '', team2Name: '', league: '', matchDate: '', status: 'SCHEDULED',
     team1Score: 0, team2Score: 0,
     odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 },
     streamUrl: '',
@@ -137,7 +137,7 @@ export const AdminMatchesPage: React.FC = () => {
   const handleAddNewClick = () => {
     setFormData({
       team1Name: '', team2Name: '',
-      league: '', matchDate: '', status: 'UPCOMING',
+      league: '', matchDate: '', status: 'SCHEDULED',
       team1Score: 0, team2Score: 0,
       odds: { team1Win: 1.5, draw: 3.0, team2Win: 2.5 },
       streamUrl: '',
