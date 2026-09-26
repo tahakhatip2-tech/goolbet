@@ -5,6 +5,7 @@ import api from '../api/axios';
 import { useMatchChat } from '../hooks/useMatchChat';
 import type { ChatMessage } from '../hooks/useMatchChat';
 import { AgoraViewer } from '../components/AgoraViewer';
+import { useTranslation } from 'react-i18next';
 
 const REACTIONS = ['⚽', '🔥', '❤️', '😱', '👏', '😂'];
 
@@ -34,6 +35,7 @@ interface Match {
 }
 
 export const WatchPage: React.FC = () => {
+  const { t } = useTranslation();
   const { matchId } = useParams<{ matchId: string }>();
   const navigate = useNavigate();
   const [match, setMatch] = useState<Match | null>(null);
@@ -65,7 +67,7 @@ export const WatchPage: React.FC = () => {
       setInitialMessages(commentsRes.data.map((c: any) => ({
         id: c.id,
         userId: c.userId,
-        username: c.user?.firstName || c.user?.username || 'مستخدم',
+        username: c.user?.firstName || c.user?.username || t('watch.user', 'مستخدم'),
         message: c.message,
         createdAt: c.createdAt
       })));
@@ -198,8 +200,8 @@ export const WatchPage: React.FC = () => {
                 <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4">
                   <span className="text-4xl">📺</span>
                 </div>
-                <p className="text-slate-400 font-semibold">البث غير متاح حالياً</p>
-                <p className="text-slate-600 text-sm mt-1">سيبدأ البث عند انطلاق المباراة</p>
+                <p className="text-slate-400 font-semibold">{t('watch.stream_unavailable', 'البث غير متاح حالياً')}</p>
+                <p className="text-slate-600 text-sm mt-1">{t('watch.stream_unavailable_sub', 'سيبدأ البث عند انطلاق المباراة')}</p>
               </div>
             )}
           </div>
@@ -210,9 +212,9 @@ export const WatchPage: React.FC = () => {
           {/* Chat header */}
           <div className="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between shrink-0">
             <span className="text-white font-bold text-sm flex items-center gap-2">
-              💬 الدردشة الحية
+              💬 {t('watch.live_chat', 'الدردشة الحية')}
             </span>
-            <span className="text-xs text-slate-500">{messages.length} رسالة</span>
+            <span className="text-xs text-slate-500">{messages.length} {t('watch.messages_count', 'رسالة')}</span>
           </div>
 
           {/* Messages */}
@@ -220,7 +222,7 @@ export const WatchPage: React.FC = () => {
             {messages.length === 0 && (
               <div className="text-center text-slate-600 text-sm py-8">
                 <p className="text-2xl mb-2">💬</p>
-                <p>كن أول من يعلق على هذه المباراة!</p>
+                <p>{t('watch.be_first_comment', 'كن أول من يعلق على هذه المباراة!')}</p>
               </div>
             )}
             {messages.map((msg) => (
@@ -267,7 +269,7 @@ export const WatchPage: React.FC = () => {
                   value={inputMsg}
                   onChange={e => setInputMsg(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="اكتب تعليقك..."
+                  placeholder={t('watch.write_comment', 'اكتب تعليقك...')}
                   maxLength={200}
                   className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none min-w-0"
                   dir="rtl"
@@ -283,9 +285,9 @@ export const WatchPage: React.FC = () => {
             ) : (
               <p className="text-center text-xs text-slate-500">
                 <button onClick={() => navigate('/login')} className="text-blue-400 underline">
-                  سجل دخولك
+                  {t('watch.login_to_chat', 'سجل دخولك')}
                 </button>
-                {' '}للمشاركة في الدردشة
+                {' '}{t('watch.login_to_chat_sub', 'للمشاركة في الدردشة')}
               </p>
             )}
           </div>

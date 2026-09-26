@@ -16,12 +16,22 @@ import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminBetsPage } from './pages/admin/AdminBetsPage';
 import { AdminBonusPage } from './pages/admin/AdminBonusPage';
 import { AdminLeaguesPage } from './pages/admin/AdminLeaguesPage';
+import { AdminCharitiesPage } from './pages/admin/AdminCharitiesPage';
+import { AdminAcademiesPage } from './pages/admin/AdminAcademiesPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { HomePage } from './pages/HomePage';
 import { ToastProvider } from './context/ToastContext';
 import { Toaster } from './components/ui/Toaster';
+import { AcademyLayout } from './layouts/AcademyLayout';
+import { AcademyDashboard } from './pages/academy/AcademyDashboard';
+import { AcademyStreamsPage } from './pages/academy/AcademyStreamsPage';
+import { AcademySettingsPage } from './pages/academy/AcademySettingsPage';
+import { AcademyTournamentsPage } from './pages/academy/AcademyTournamentsPage';
+import { RegisterAcademyPage } from './pages/RegisterAcademyPage';
+import { TournamentsPage } from './pages/TournamentsPage';
+import { TournamentDetailsPage } from './pages/TournamentDetailsPage';
 
 function App() {
   const { i18n } = useTranslation();
@@ -41,15 +51,27 @@ function App() {
           <Route index element={<AdminHome />} />
           <Route path="matches" element={<AdminMatchesPage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="academies" element={<AdminAcademiesPage />} />
           <Route path="transactions" element={<AdminTransactionsPage />} />
           <Route path="api-hub" element={<AdminApiHubPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="bets" element={<AdminBetsPage />} />
           <Route path="bonus" element={<AdminBonusPage />} />
           <Route path="leagues" element={<AdminLeaguesPage />} />
+          <Route path="charities" element={<AdminCharitiesPage />} />
         </Route>
+        
+        {/* Academy Routes */}
+        <Route path="/academy" element={<AcademyLayout />}>
+          <Route index element={<AcademyDashboard />} />
+          <Route path="streams" element={<AcademyStreamsPage />} />
+          <Route path="settings" element={<AcademySettingsPage />} />
+          <Route path="tournaments" element={<AcademyTournamentsPage />} />
+        </Route>
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register-academy" element={<RegisterAcademyPage />} />
         <Route path="/watch/:matchId" element={<WatchPage />} />
         <Route path="/*" element={
           <UserLayout>
@@ -59,6 +81,8 @@ function App() {
               <Route path="/wallet" element={<WalletPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/match/:id" element={<MatchDetailsPage />} />
+              <Route path="/tournaments" element={<TournamentsPage />} />
+              <Route path="/tournaments/:id" element={<TournamentDetailsPage />} />
             </Routes>
           </UserLayout>
         } />

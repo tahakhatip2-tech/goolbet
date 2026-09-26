@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../api/axios';
 
 interface Notification {
@@ -14,6 +15,7 @@ interface Notification {
 }
 
 export const NotificationDropdown: React.FC = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -98,12 +100,12 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-x-4 sm:inset-x-auto sm:absolute sm:end-0 top-[72px] sm:top-full sm:mt-2 sm:w-80 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200 sm:origin-top-end origin-top">
+        <div className="absolute end-0 top-full mt-2 w-72 sm:w-80 max-h-[85vh] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200 origin-top-end">
           <div className="p-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800">الإشعارات</h3>
+            <h3 className="font-bold text-slate-800">{t('notifications.title')}</h3>
             {unreadCount > 0 && (
               <button onClick={handleMarkAllAsRead} className="text-xs text-primary hover:text-emerald-700 font-medium flex items-center gap-1 transition-colors">
-                <Check size={14} /> مقروء للكل
+                <Check size={14} /> {t('notifications.mark_all_read')}
               </button>
             )}
           </div>
@@ -112,7 +114,7 @@ export const NotificationDropdown: React.FC = () => {
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-slate-400 flex flex-col items-center gap-2">
                 <Bell size={24} className="opacity-20" />
-                <p className="text-sm">لا توجد إشعارات حالياً</p>
+                <p className="text-sm">{t('notifications.no_notifications')}</p>
               </div>
             ) : (
               <div className="flex flex-col">

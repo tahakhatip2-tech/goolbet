@@ -19,6 +19,17 @@ export const register = async (userData: any) => {
   return response.data;
 };
 
+export const registerAcademy = async (academyData: any) => {
+  const response = await api.post('/auth/register-academy', academyData);
+  if (response.data.token) {
+    localStorage.setItem('token', response.data.token);
+  }
+  if (response.data.user) {
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+  }
+  return response.data;
+};
+
 export const logout = () => {
   localStorage.removeItem('token');
 };

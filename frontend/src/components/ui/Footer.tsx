@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Copyright } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FacebookIcon = ({ size = 20, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -19,6 +20,7 @@ const TelegramIcon = ({ size = 20, className = "" }) => (
 );
 
 export const Footer: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <footer className="relative mt-12 border-t border-slate-200 bg-white/60 backdrop-blur-xl pb-20 md:pb-6 pt-6 overflow-hidden">
       {/* Background decoration */}
@@ -41,7 +43,7 @@ export const Footer: React.FC = () => {
               </span>
             </Link>
             <p className="text-slate-500 text-xs leading-relaxed">
-              منصتك الأولى للمراهنات الرياضية. استمتع بأفضل الاحتمالات، وتجربة مستخدم لا مثيل لها بضمان الأمان والموثوقية.
+              {t('footer.description', 'منصتك الأولى للمراهنات الرياضية. استمتع بأفضل الاحتمالات، وتجربة مستخدم لا مثيل لها بضمان الأمان والموثوقية.')}
             </p>
           </div>
 
@@ -70,14 +72,14 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs">
           <div className="text-slate-400 flex items-center gap-1">
             <Copyright size={12} />
-            <span>{new Date().getFullYear()} Goolbet. جميع الحقوق محفوظة.</span>
+            <span>{new Date().getFullYear()} Goolbet. {t('footer.rights_reserved', 'جميع الحقوق محفوظة.')}</span>
           </div>
           
           {/* Developer Signature */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100 shadow-sm">
-            <span className="text-slate-500 text-[10px]">المطور:</span>
+            <span className="text-slate-500 text-[10px]">{t('footer.developer', 'المطور:')}</span>
             <span className="font-bold text-[10px] bg-clip-text text-transparent bg-gradient-to-r from-primary to-green-500 flex items-center gap-1">
-              طه الخطيب
+              {t('footer.developer_name', 'طه الخطيب')}
             </span>
           </div>
         </div>

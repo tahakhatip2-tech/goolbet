@@ -3,8 +3,10 @@ import api from '../api/axios';
 import { Mail, Trophy, Activity, Wallet, ShieldCheck } from 'lucide-react';
 
 import { HeroSection } from '../components/ui/HeroSection';
+import { useTranslation } from 'react-i18next';
 
 export const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const [bets, setBets] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [wallet, setWallet] = useState<any>(null);
@@ -43,9 +45,9 @@ export const ProfilePage: React.FC = () => {
   const wonBets = bets.filter(b => b.status === 'WON');
 
   const getSelectionText = (selection: string, team1Name: string, team2Name: string) => {
-    if (selection === 'TEAM_1_WIN') return `فوز ${team1Name}`;
-    if (selection === 'TEAM_2_WIN') return `فوز ${team2Name}`;
-    if (selection === 'DRAW') return 'تعادل';
+    if (selection === 'TEAM_1_WIN') return `${t('matches.win_1')} ${team1Name}`;
+    if (selection === 'TEAM_2_WIN') return `${t('matches.win_2')} ${team2Name}`;
+    if (selection === 'DRAW') return t('matches.draw');
     return selection;
   };
 
@@ -54,21 +56,21 @@ export const ProfilePage: React.FC = () => {
       return (
         <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow-sm whitespace-nowrap">
           <Trophy size={12} />
-          ربح +${Number(potentialPayout).toFixed(2)}
+          {t('profile.status_won')} +${Number(potentialPayout).toFixed(2)}
         </div>
       );
     }
     if (status === 'LOST') {
       return (
         <div className="bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm whitespace-nowrap">
-          خسارة
+          {t('profile.status_lost')}
         </div>
       );
     }
     return (
       <div className="bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow-sm whitespace-nowrap">
         <Activity size={12} />
-        نشط
+        {t('profile.status_pending')}
       </div>
     );
   };
@@ -86,39 +88,39 @@ export const ProfilePage: React.FC = () => {
       <HeroSection 
         title={
           <>
-            مرحباً بك في <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">عالم Goolbet</span>
+            {t('profile.title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{t('profile.title_highlight')}</span>
           </>
         }
-        subtitle="تابع سجل رهاناتك، تحكم في إعداداتك، وابقَ على اطلاع دائم."
-        badge="الملف الشخصي 👤"
+        subtitle={t('profile.subtitle')}
+        badge={t('profile.badge')}
         minHeight="min-h-[30vh]"
       >
         <div className="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-2xl mx-auto">
           {/* Total Bets Card */}
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <Activity size={20} className="text-blue-500 mb-1" />
-            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">الرهانات</span>
+            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">{t('nav.bets')}</span>
             <span className="text-lg md:text-xl font-black text-slate-900">{bets.length}</span>
           </div>
           
           {/* Won Bets Card */}
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <Trophy size={20} className="text-green-500 mb-1" />
-            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">فوز</span>
+            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">{t('profile.status_won')}</span>
             <span className="text-lg md:text-xl font-black text-slate-900">{wonBets.length}</span>
           </div>
 
           {/* Real Balance Card */}
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <Wallet size={20} className="text-slate-700 mb-1" />
-            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">الرصيد</span>
+            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">{t('wallet.available_balance')}</span>
             <span className="text-lg md:text-xl font-black text-slate-900">${wallet?.balance?.toFixed(1) || '0.0'}</span>
           </div>
 
           {/* Bonus Balance Card */}
           <div className="bg-white/50 backdrop-blur-sm border border-slate-200 shadow-sm rounded-2xl p-3 flex flex-col items-center justify-center text-center hover:bg-white/70 transition-all cursor-pointer">
             <span className="text-xl mb-1">🎁</span>
-            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">بونص</span>
+            <span className="text-[10px] md:text-xs text-slate-500 font-bold mb-1">{t('wallet.bonus_balance')}</span>
             <span className="text-lg md:text-xl font-black text-slate-900">${wallet?.bonusBalance?.toFixed(1) || '0.0'}</span>
           </div>
         </div>
@@ -134,7 +136,7 @@ export const ProfilePage: React.FC = () => {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary shadow-[0_0_15px_rgba(34,197,94,0.15)]">
                 <Activity size={20} />
               </div>
-              <h2 className="text-2xl font-bold tracking-tight">الرهانات النشطة</h2>
+              <h2 className="text-2xl font-bold tracking-tight">{t('wallet.locked_bets')}</h2>
             </div>
             
             <div className="grid gap-4">
@@ -143,8 +145,8 @@ export const ProfilePage: React.FC = () => {
                   <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 text-slate-400">
                     <Trophy size={24} />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-700 mb-1">لا توجد رهانات نشطة حالياً</h3>
-                  <p className="text-slate-500 text-sm">توقع نتائج المباريات القادمة وابدأ في ربح الأرباح</p>
+                  <h3 className="text-lg font-bold text-slate-700 mb-1">{t('profile.no_bets')}</h3>
+                  <p className="text-slate-500 text-sm"></p>
                 </div>
               ) : (
                 activeBets.map(bet => (
@@ -156,25 +158,25 @@ export const ProfilePage: React.FC = () => {
                         <div className="text-center md:text-right w-full">
                           <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-full text-[10px] font-bold mb-4 tracking-wide">
                             <Activity size={12} />
-                            مباراة قادمة
+                            {t('matches.upcoming')}
                           </div>
-                          <h3 className="font-bold text-xl mb-3 text-slate-800">{bet.match.team1Name} <span className="text-slate-400 font-normal px-2">ضد</span> {bet.match.team2Name}</h3>
+                          <h3 className="font-bold text-xl mb-3 text-slate-800">{bet.match.team1Name} <span className="text-slate-400 font-normal px-2">{t('matches.vs')}</span> {bet.match.team2Name}</h3>
                           
                           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-sm">
-                            <span className="text-slate-500 text-xs font-bold">اختيارك:</span>
+                            <span className="text-slate-500 text-xs font-bold">{t('profile.bet_on')}</span>
                             <span className="bg-slate-800 text-white font-bold px-3 py-1 rounded-md text-xs shadow-sm">{getSelectionText(bet.selection, bet.match.team1Name, bet.match.team2Name)}</span>
-                            <span className="text-[10px] text-slate-400 font-bold mr-2">(نسبة: {bet.oddsAtBet})</span>
+                            <span className="text-[10px] text-slate-400 font-bold mr-2">({t('profile.odds')} {bet.oddsAtBet})</span>
                           </div>
                         </div>
                         
                         <div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
                           <div className="bg-white rounded-2xl p-4 flex-1 md:w-32 text-center border border-slate-100 shadow-sm flex flex-col justify-center">
-                            <span className="text-[10px] font-bold text-slate-400 mb-1">مبلغ الرهان</span>
+                            <span className="text-[10px] font-bold text-slate-400 mb-1">{t('profile.stake')}</span>
                             <span className="font-black text-xl text-slate-800">${Number(bet.stake).toFixed(2)}</span>
                           </div>
                           <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-4 flex-1 md:w-32 text-center border border-primary/20 shadow-sm flex flex-col justify-center relative overflow-hidden">
                             <div className="absolute inset-0 bg-primary/5 backdrop-blur-[1px]"></div>
-                            <span className="text-[10px] font-bold text-primary/80 mb-1 relative z-10">العائد المحتمل</span>
+                            <span className="text-[10px] font-bold text-primary/80 mb-1 relative z-10">{t('profile.potential_return')}</span>
                             <span className="font-black text-xl text-primary relative z-10">${Number(bet.potentialPayout).toFixed(2)}</span>
                           </div>
                         </div>
@@ -194,30 +196,30 @@ export const ProfilePage: React.FC = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-500">
                 <Wallet size={20} />
               </div>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900">سجل الرهانات</h2>
+              <h2 className="text-xl font-bold tracking-tight text-slate-900">{t('profile.bets_history')}</h2>
             </div>
 
             <div className="glass rounded-3xl p-2 border border-border/40 max-h-[600px] overflow-y-auto no-scrollbar">
               {pastBets.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 font-medium">
-                  لا توجد رهانات سابقة.
+                  {t('profile.no_bets')}
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
                   {pastBets.map(bet => (
                     <div key={bet.id} className="bg-white hover:bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm transition-all group">
                       <div className="flex justify-between items-start mb-4">
-                        <div className="font-bold text-sm text-slate-800 line-clamp-1 flex-1 pl-2">{bet.match?.team1Name} <span className="text-slate-400 font-normal text-xs px-1">ضد</span> {bet.match?.team2Name}</div>
+                        <div className="font-bold text-sm text-slate-800 line-clamp-1 flex-1 pl-2">{bet.match?.team1Name} <span className="text-slate-400 font-normal text-xs px-1">{t('matches.vs')}</span> {bet.match?.team2Name}</div>
                         {getStatusBadge(bet.status, bet.potentialPayout)}
                       </div>
                       
                       <div className="flex justify-between items-end bg-slate-50 p-3 rounded-xl border border-slate-100/50">
                         <div className="flex flex-col gap-1.5">
-                          <div className="text-[10px] text-slate-500 font-bold">الاختيار: <span className="text-slate-800 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{getSelectionText(bet.selection, bet.match?.team1Name, bet.match?.team2Name)}</span></div>
-                          <div className="text-[10px] text-slate-500 font-bold">الرهان: <span className="text-slate-800 font-black">${Number(bet.stake).toFixed(2)}</span></div>
+                          <div className="text-[10px] text-slate-500 font-bold">{t('profile.bet_on')} <span className="text-slate-800 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{getSelectionText(bet.selection, bet.match?.team1Name, bet.match?.team2Name)}</span></div>
+                          <div className="text-[10px] text-slate-500 font-bold">{t('profile.stake')} <span className="text-slate-800 font-black">${Number(bet.stake).toFixed(2)}</span></div>
                         </div>
                         <div className="text-[10px] text-slate-400 font-bold bg-white px-2 py-1 rounded-md border border-slate-100 shadow-sm">
-                          النسبة: {bet.oddsAtBet}
+                          {t('profile.odds')} {bet.oddsAtBet}
                         </div>
                       </div>
                     </div>

@@ -23,7 +23,8 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   }, []);
 
   const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar');
+    const currentLang = i18n.resolvedLanguage || i18n.language || 'ar';
+    i18n.changeLanguage(currentLang.startsWith('ar') ? 'en' : 'ar');
   };
 
   const userString = localStorage.getItem('user');
@@ -49,13 +50,16 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }
           <nav className="hidden md:flex gap-6">
             <Link to="/" className="hover:text-primary transition-colors">{t('nav.home')}</Link>
             <Link to="/matches" className="hover:text-primary transition-colors">{t('nav.matches')}</Link>
+            <Link to="/tournaments" className="hover:text-primary transition-colors flex items-center gap-1">
+              🏆 {t('nav.tournaments', 'البطولات')}
+            </Link>
             <Link to="/wallet" className="hover:text-primary transition-colors">{t('nav.wallet')}</Link>
             <Link to="/profile" className="hover:text-primary transition-colors">{t('nav.profile')}</Link>
           </nav>
 
             <div className="flex items-center gap-2 md:gap-4">
               <Button variant="ghost" className="px-2" onClick={toggleLanguage}>
-                {i18n.language === 'ar' ? 'EN' : 'عربي'}
+                {(i18n.resolvedLanguage || i18n.language)?.startsWith('ar') ? 'EN' : 'عربي'}
               </Button>
               {isLoggedIn ? (
                 <div className="flex items-center gap-2">

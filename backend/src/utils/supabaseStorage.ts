@@ -1,71 +1,60 @@
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY || '';
-const BUCKET_NAME = 'team-logos';
-
-// Use service role key for server-side uploads (bypasses RLS)
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
 /**
- * Ensures the storage bucket exists and is publicly accessible.
- * Called once when the server starts.
+ * fileStorage.ts
+ * 
+ * محرك تخزين الملفات - يُستبدل بالمزود الجديد عند توفر بيانات الاتصال.
+ * حالياً يعمل بالتخزين المحلي فقط (uploads/).
  */
-export async function ensureBucketExists() {
-  try {
-    const { data: buckets } = await supabase.storage.listBuckets();
-    const exists = buckets?.some(b => b.name === BUCKET_NAME);
-    if (!exists) {
-      await supabase.storage.createBucket(BUCKET_NAME, { public: true });
-      console.log(`✅ Created Supabase Storage bucket: ${BUCKET_NAME}`);
-    }
-  } catch (err) {
-    console.warn('Could not ensure bucket exists (may already exist):', err);
-  }
+import fs from 'fs';
+import path from 'path';
+
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+
+// نأكد من وجود مجلد الرفع
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 /**
- * Uploads a file from a local path to Supabase Storage.
- * Returns the public URL of the uploaded file.
+ * "رفع" ملف: في الوضع الحالي يُبقي الملف في مجلد uploads المحلي
+ * ويعيد مساره النسبي. سيُستبدل بالمزود السحابي لاحقاً.
  */
-export async function uploadFileToSupabase(
+export async function uploadFile(
   localPath: string,
   fileName: string,
-  mimeType: string
+  _mimeType: string
 ): Promise<string> {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-    throw new Error('Supabase env vars missing: SUPABASE_URL or SUPABASE_SECRET_KEY not set on the server.');
+  const dest = path.join(UPLOADS_DIR, fileName);
+
+  // انقل الملف إلى مجلد uploads إن لم يكن فيه بالفعل
+  if (localPath !== dest && fs.existsSync(localPath)) {
+    fs.copyFileSync(localPath, dest);
+    fs.unlinkSync(localPath);
   }
 
-  const fileBuffer = fs.readFileSync(localPath);
-
-  const { error } = await supabase.storage
-    .from(BUCKET_NAME)
-    .upload(fileName, fileBuffer, {
-      contentType: mimeType,
-      upsert: true,
-    });
-
-  if (error) {
-    throw new Error(`Supabase upload failed: ${error.message}`);
-  }
-
-  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
-  return data.publicUrl;
+  // أعد URL نسبي (سيُستبدل بـ CDN URL لاحقاً)
+  return `/uploads/${fileName}`;
 }
 
 /**
- * Deletes a file from Supabase Storage by its public URL.
+ * حذف ملف من التخزين.
  */
-export async function deleteFileFromSupabase(publicUrl: string) {
+export async function deleteFile(fileUrl: string): Promise<void> {
   try {
-    // Extract the file path from the URL
-    const urlParts = publicUrl.split(`/${BUCKET_NAME}/`);
-    if (urlParts.length < 2) return;
-    const filePath = urlParts[1];
-    await supabase.storage.from(BUCKET_NAME).remove([filePath]);
+    const fileName = path.basename(fileUrl);
+    const filePath = path.join(UPLOADS_DIR, fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   } catch (err) {
-    console.warn('Could not delete file from Supabase:', err);
+    console.warn('Could not delete file:', err);
   }
+}
+
+/**
+ * للتوافق مع الكود القديم - نفس uploadFile
+ */
+export const uploadFileToSupabase = uploadFile;
+export const deleteFileFromSupabase = deleteFile;
+export async function ensureBucketExists(): Promise<void> {
+  // لا شيء مطلوب في وضع التخزين المحلي
 }

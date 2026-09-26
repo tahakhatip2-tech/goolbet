@@ -34,18 +34,18 @@ export const RegisterPage: React.FC = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.warning('يرجى إدخال بريد إلكتروني صحيح.');
-      return setError('يرجى إدخال بريد إلكتروني صحيح.');
+      toast.warning(t('auth.invalid_email', 'يرجى إدخال بريد إلكتروني صحيح.'));
+      return setError(t('auth.invalid_email', 'يرجى إدخال بريد إلكتروني صحيح.'));
     }
 
     if (formData.password.length < 8) {
-      toast.warning('كلمة المرور يجب أن تكون 8 أحرف على الأقل.');
-      return setError('كلمة المرور يجب أن تكون 8 أحرف على الأقل.');
+      toast.warning(t('auth.password_min_length', 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.'));
+      return setError(t('auth.password_min_length', 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.'));
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.warning('كلمتا المرور غير متطابقتين.');
-      return setError('كلمتا المرور غير متطابقتين.');
+      toast.warning(t('auth.passwords_mismatch', 'كلمتا المرور غير متطابقتين.'));
+      return setError(t('auth.passwords_mismatch', 'كلمتا المرور غير متطابقتين.'));
     }
 
     setIsLoading(true);
@@ -65,10 +65,10 @@ export const RegisterPage: React.FC = () => {
       localStorage.setItem('token', loginRes.data.token);
       localStorage.setItem('user', JSON.stringify(loginRes.data.user));
       
-      toast.success('تم إنشاء الحساب بنجاح');
+      toast.success(t('auth.register_success', 'تم إنشاء الحساب بنجاح'));
       navigate('/');
     } catch (err: any) {
-      const msg = err.response?.data?.error || 'حدث خطأ أثناء إنشاء الحساب';
+      const msg = err.response?.data?.error || t('auth.register_error', 'حدث خطأ أثناء إنشاء الحساب');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -84,7 +84,7 @@ export const RegisterPage: React.FC = () => {
       navigate('/');
     } catch (err: any) {
       console.error('Telegram login error:', err);
-      const msg = err.response?.data?.error || 'حدث خطأ أثناء التسجيل عبر تيليجرام';
+      const msg = err.response?.data?.error || t('auth.telegram_register_error', 'حدث خطأ أثناء التسجيل عبر تيليجرام');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -103,7 +103,7 @@ export const RegisterPage: React.FC = () => {
       {/* Back button */}
       <Link to="/" className="absolute top-4 right-4 z-20 flex items-center gap-1.5 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10">
         <ArrowRight size={16} />
-        <span className="text-xs font-medium">الرئيسية</span>
+        <span className="text-xs font-medium">{t('auth.home', 'الرئيسية')}</span>
       </Link>
 
       {/* Glassmorphic Modal taking full possible space compressed */}
@@ -117,7 +117,7 @@ export const RegisterPage: React.FC = () => {
           <h1 className="text-xl sm:text-2xl font-black tracking-wide leading-none bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,197,94,0.4)] pb-0.5">
             Goolbet
           </h1>
-          <p className="text-white/70 text-[9px] sm:text-[10px] mt-0.5 font-medium tracking-wide">تسجيل حساب جديد</p>
+          <p className="text-white/70 text-[9px] sm:text-[10px] mt-0.5 font-medium tracking-wide">{t('auth.register_title', 'تسجيل حساب جديد')}</p>
         </div>
 
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-3 sm:p-5 rounded-2xl sm:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col justify-center w-full overflow-hidden">
@@ -131,7 +131,7 @@ export const RegisterPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2.5">
             <div className="space-y-0.5">
-              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">اسم المستخدم (Username)</label>
+              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">{t('auth.username_label', 'اسم المستخدم (Username)')}</label>
               <input 
                 type="text" 
                 required
@@ -144,7 +144,7 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div className="space-y-0.5">
-              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">البريد الإلكتروني</label>
+              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">{t('auth.email_label', 'البريد الإلكتروني')}</label>
               <input 
                 type="email" 
                 required
@@ -156,7 +156,7 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div className="space-y-0.5">
-              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">كلمة المرور</label>
+              <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">{t('auth.password_label', 'كلمة المرور')}</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
@@ -179,9 +179,9 @@ export const RegisterPage: React.FC = () => {
 
             <div className="space-y-0.5">
               <div className="flex justify-between items-center">
-                <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">تأكيد كلمة المرور</label>
-                {isMatch && <span className="text-[8px] sm:text-[10px] font-medium text-emerald-400 flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-1 sm:px-1.5 py-0.5 rounded-full"><CheckCircle2 size={8} /> متطابقة</span>}
-                {isMismatch && <span className="text-[8px] sm:text-[10px] font-medium text-red-400 flex items-center gap-1 bg-red-500/10 border border-red-500/20 px-1 sm:px-1.5 py-0.5 rounded-full"><XCircle size={8} /> غير متطابقة</span>}
+                <label className="block text-[9px] sm:text-[11px] font-medium text-white/80">{t('auth.confirm_password_label', 'تأكيد كلمة المرور')}</label>
+                {isMatch && <span className="text-[8px] sm:text-[10px] font-medium text-emerald-400 flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-1 sm:px-1.5 py-0.5 rounded-full"><CheckCircle2 size={8} /> {t('auth.match', 'متطابقة')}</span>}
+                {isMismatch && <span className="text-[8px] sm:text-[10px] font-medium text-red-400 flex items-center gap-1 bg-red-500/10 border border-red-500/20 px-1 sm:px-1.5 py-0.5 rounded-full"><XCircle size={8} /> {t('auth.mismatch', 'غير متطابقة')}</span>}
               </div>
               <div className="relative">
                 <input 
@@ -204,14 +204,14 @@ export const RegisterPage: React.FC = () => {
             </div>
             
             <Button disabled={isLoading} className="w-full h-8 sm:h-10 mt-1 text-xs sm:text-sm font-bold shadow-[0_0_10px_rgba(34,197,94,0.3)] hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all active:scale-[0.98]" type="submit">
-              {isLoading ? 'جاري الإنشاء...' : 'إنشاء الحساب'}
+              {isLoading ? t('auth.registering', 'جاري الإنشاء...') : t('auth.register_button', 'إنشاء الحساب')}
               {!isLoading && <ArrowLeft className="mr-1 sm:mr-1.5" size={14} />}
             </Button>
           </form>
 
           <div className="relative flex items-center justify-center my-2 sm:my-3">
             <div className="border-t border-white/10 w-full absolute"></div>
-            <div className="bg-[#1a2233] px-2 relative text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider rounded-full py-0.5 border border-white/5">أو</div>
+            <div className="bg-[#1a2233] px-2 relative text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider rounded-full py-0.5 border border-white/5">{t('auth.or', 'أو')}</div>
           </div>
 
           <div className="space-y-1 sm:space-y-2">
@@ -224,7 +224,7 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <p className="text-center text-[10px] sm:text-xs text-white/60 mt-2 sm:mt-4">
-            لديك حساب بالفعل؟ <Link to="/login" className="font-bold text-primary hover:text-white transition-all">تسجيل الدخول</Link>
+            {t('auth.have_account', 'لديك حساب بالفعل؟')} <Link to="/login" className="font-bold text-primary hover:text-white transition-all">{t('auth.login_link', 'تسجيل الدخول')}</Link>
           </p>
         </div>
 

@@ -1,17 +1,15 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db';
 
-export const getMatches = async (req: Request, res: Response) => {
+// Legacy endpoints - now redirected to streams
+export const getMatches = async (_req: Request, res: Response) => {
   try {
-    const matches = await prisma.match.findMany({
-      include: {
-        odds: {
-          where: { isActive: true }
-        }
-      },
-      orderBy: { matchDate: 'asc' }
+    const streams = await prisma.stream.findMany({
+      where: { streamType: 'MATCH', status: { in: ['SCHEDULED', 'LIVE'] } },
+      include: { odds: { where: { isActive: true } }, academy: { select: { name: true, logo: true } } },
+      orderBy: { scheduledAt: 'asc' }
     });
-    res.json(matches);
+    res.json(streams);
   } catch (error: any) {
     res.status(500).json({ error: 'Server error', details: error.message });
   }
@@ -20,20 +18,12 @@ export const getMatches = async (req: Request, res: Response) => {
 export const getMatchById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const match = await prisma.match.findUnique({
+    const stream = await prisma.stream.findUnique({
       where: { id },
-      include: {
-        odds: {
-          where: { isActive: true }
-        }
-      }
+      include: { odds: { where: { isActive: true } }, academy: { select: { name: true, logo: true } } }
     });
-    
-    if (!match) {
-      return res.status(404).json({ error: 'Match not found' });
-    }
-    
-    res.json(match);
+    if (!stream) return res.status(404).json({ error: 'Not found' });
+    res.json(stream);
   } catch (error: any) {
     res.status(500).json({ error: 'Server error', details: error.message });
   }

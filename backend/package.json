@@ -16,7 +16,6 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.11.0",
-    "@supabase/supabase-js": "^2.116.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.20.0",

@@ -1,42 +1,57 @@
 import { Router } from 'express';
-import { getStats, createMatch, updateMatch, deleteMatch, settleMatch, startMatch, updateLiveMatch, getPendingTransactions, getTransactionStats, getPendingTransactionsCount, processTransaction, getMatchBets, getUsers, toggleUserStatus, manageWallet, getAllBets, manageBonus, getLeagues, createLeague, deleteLeague, toggleStream, getSetting, updateSetting } from '../controllers/adminController';
 import { authenticate, requireRole } from '../middlewares/authMiddleware';
 import { upload } from '../middlewares/uploadMiddleware';
+import {
+  getStats,
+  getUsers, toggleUserStatus, manageWallet, manageBonus,
+  getAcademies, verifyAcademy, toggleAcademyStatus,
+  getAllStreams, getStreamBets, settleStream, adminUpdateStream, adminDeleteStream,
+  getAllBets,
+  getPendingTransactions, getTransactionStats, getPendingTransactionsCount, processTransaction,
+  getSetting, updateSetting,
+  getLeagues, createLeague, deleteLeague,
+} from '../controllers/adminController';
 
 const router = Router();
+const adminAuth = [authenticate, requireRole(['ADMIN', 'SUPER_ADMIN'])];
 
-// Protect all admin routes
-router.use(authenticate);
-router.use(requireRole(['ADMIN', 'SUPER_ADMIN']));
+// Dashboard
+router.get('/stats', ...adminAuth, getStats);
 
-router.get('/stats', getStats);
-router.post('/matches', upload.fields([{ name: 'team1Logo', maxCount: 1 }, { name: 'team2Logo', maxCount: 1 }]), createMatch);
-router.put('/matches/:id', upload.fields([{ name: 'team1Logo', maxCount: 1 }, { name: 'team2Logo', maxCount: 1 }]), updateMatch);
-router.delete('/matches/:id', deleteMatch);
-router.put('/matches/:id/settle', settleMatch);
-router.put('/matches/:id/start', startMatch);
-router.put('/matches/:id/live-update', updateLiveMatch);
-router.put('/matches/:id/stream', toggleStream);
-router.get('/matches/:id/bets', getMatchBets);
+// Academies
+router.get('/academies', ...adminAuth, getAcademies);
+router.put('/academies/:id/verify', ...adminAuth, verifyAcademy);
+router.put('/academies/:id/toggle', ...adminAuth, toggleAcademyStatus);
 
-router.get('/transactions', getPendingTransactions);
-router.get('/transactions/pending-count', getPendingTransactionsCount);
-router.get('/transactions/stats', getTransactionStats);
-router.put('/transactions/:id/process', processTransaction);
+// Streams
+router.get('/streams', ...adminAuth, getAllStreams);
+router.get('/streams/:id/bets', ...adminAuth, getStreamBets);
+router.post('/streams/:id/settle', ...adminAuth, settleStream);
+router.put('/streams/:id', ...adminAuth, adminUpdateStream);
+router.delete('/streams/:id', ...adminAuth, adminDeleteStream);
 
-router.get('/users', getUsers);
-router.put('/users/:id/toggle-status', toggleUserStatus);
-router.post('/users/:id/wallet', manageWallet);
-router.post('/users/:id/bonus', manageBonus);
-router.get('/bets', getAllBets);
+// Bets
+router.get('/bets', ...adminAuth, getAllBets);
 
-// Leagues
-router.get('/leagues', getLeagues);
-router.post('/leagues', upload.single('logo'), createLeague);
-router.delete('/leagues/:id', deleteLeague);
+// Users
+router.get('/users', ...adminAuth, getUsers);
+router.put('/users/:id/toggle', ...adminAuth, toggleUserStatus);
+router.put('/users/:id/wallet', ...adminAuth, manageWallet);
+router.put('/users/:id/bonus', ...adminAuth, manageBonus);
+
+// Transactions
+router.get('/transactions', ...adminAuth, getPendingTransactions);
+router.get('/transactions/stats', ...adminAuth, getTransactionStats);
+router.get('/transactions/pending-count', ...adminAuth, getPendingTransactionsCount);
+router.put('/transactions/:id/process', ...adminAuth, processTransaction);
 
 // Settings
-router.get('/settings/:key', getSetting);
-router.put('/settings/:key', updateSetting);
+router.get('/settings/:key', ...adminAuth, getSetting);
+router.put('/settings/:key', ...adminAuth, updateSetting);
+
+// Leagues
+router.get('/leagues', ...adminAuth, getLeagues);
+router.post('/leagues', ...adminAuth, upload.single('logo'), createLeague);
+router.delete('/leagues/:id', ...adminAuth, deleteLeague);
 
 export default router;

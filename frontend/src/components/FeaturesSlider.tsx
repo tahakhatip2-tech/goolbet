@@ -1,38 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Zap, ShieldCheck, Trophy, ChevronLeft, ChevronRight } from "lucide-react";
-
-const features = [
-  {
-    iconName: "zap",
-    iconBg: "bg-primary/10",
-    borderHover: "hover:border-primary/40",
-    gradientFrom: "from-primary/5",
-    title: "احتمالات حية وديناميكية",
-    description: "تحديثات فورية للاحتمالات (Odds) لضمان حصولك على أفضل العوائد في كل ثانية من المباراة.",
-    badge: "⚡ مباشر",
-    badgeClass: "bg-primary/10 text-primary",
-  },
-  {
-    iconName: "shield",
-    iconBg: "bg-blue-500/10",
-    borderHover: "hover:border-blue-500/40",
-    gradientFrom: "from-blue-500/5",
-    title: "محفظة آمنة",
-    description: "إيداع وسحب فوري مع أعلى معايير الأمان والتشفير لضمان حماية أموالك.",
-    badge: "🔒 موثوق",
-    badgeClass: "bg-blue-500/10 text-blue-600",
-  },
-  {
-    iconName: "trophy",
-    iconBg: "bg-amber-500/10",
-    borderHover: "hover:border-amber-500/40",
-    gradientFrom: "from-amber-500/5",
-    title: "دفع فوري وتلقائي",
-    description: "بمجرد انتهاء المباراة وتحديد النتيجة، يتم إضافة أرباحك إلى محفظتك بشكل تلقائي وفوري.",
-    badge: "🏆 ضامنون",
-    badgeClass: "bg-amber-500/10 text-amber-600",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const FeatureIcon: React.FC<{ name: string }> = ({ name }) => {
   if (name === "zap") return <Zap className="w-5 h-5 text-primary" />;
@@ -41,6 +9,42 @@ const FeatureIcon: React.FC<{ name: string }> = ({ name }) => {
 };
 
 export const FeaturesSlider: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
+  const features = [
+    {
+      iconName: "zap",
+      iconBg: "bg-primary/10",
+      borderHover: "hover:border-primary/40",
+      gradientFrom: "from-primary/5",
+      title: t('features_slider.feature_1_title', 'احتمالات حية وديناميكية'),
+      description: t('features_slider.feature_1_desc', 'تحديثات فورية للاحتمالات (Odds) لضمان حصولك على أفضل العوائد في كل ثانية من المباراة.'),
+      badge: t('features_slider.feature_1_badge', '⚡ مباشر'),
+      badgeClass: "bg-primary/10 text-primary",
+    },
+    {
+      iconName: "shield",
+      iconBg: "bg-blue-500/10",
+      borderHover: "hover:border-blue-500/40",
+      gradientFrom: "from-blue-500/5",
+      title: t('features_slider.feature_2_title', 'محفظة آمنة'),
+      description: t('features_slider.feature_2_desc', 'إيداع وسحب فوري مع أعلى معايير الأمان والتشفير لضمان حماية أموالك.'),
+      badge: t('features_slider.feature_2_badge', '🔒 موثوق'),
+      badgeClass: "bg-blue-500/10 text-blue-600",
+    },
+    {
+      iconName: "trophy",
+      iconBg: "bg-amber-500/10",
+      borderHover: "hover:border-amber-500/40",
+      gradientFrom: "from-amber-500/5",
+      title: t('features_slider.feature_3_title', 'دفع فوري وتلقائي'),
+      description: t('features_slider.feature_3_desc', 'بمجرد انتهاء المباراة وتحديد النتيجة، يتم إضافة أرباحك إلى محفظتك بشكل تلقائي وفوري.'),
+      badge: t('features_slider.feature_3_badge', '🏆 ضامنون'),
+      badgeClass: "bg-amber-500/10 text-amber-600",
+    },
+  ];
+
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
@@ -84,7 +88,7 @@ export const FeaturesSlider: React.FC = () => {
   const feat = features[current];
 
   return (
-    <div className="relative select-none max-w-lg mx-auto" dir="rtl">
+    <div className="relative select-none max-w-lg mx-auto" dir={isRtl ? "rtl" : "ltr"}>
       <div
         className={`relative overflow-hidden bg-gradient-to-br ${feat.gradientFrom} to-white rounded-2xl border border-slate-200 ${feat.borderHover} transition-all duration-300 shadow-md p-4 flex flex-col gap-2 cursor-grab active:cursor-grabbing`}
         style={{
@@ -109,11 +113,11 @@ export const FeaturesSlider: React.FC = () => {
         <p className="text-slate-500 text-xs leading-relaxed">{feat.description}</p>
       </div>
 
-      <button onClick={() => { resetAutoPlay(); prev(); }} className="absolute top-1/2 -translate-y-1/2 -right-4 z-20 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-primary/5 hover:border-primary/40 hover:text-primary transition-all active:scale-90" aria-label="السابق">
-        <ChevronRight className="w-5 h-5" />
+      <button onClick={() => { resetAutoPlay(); prev(); }} className={`absolute top-1/2 -translate-y-1/2 ${isRtl ? '-right-4' : '-left-4'} z-20 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-primary/5 hover:border-primary/40 hover:text-primary transition-all active:scale-90`} aria-label="السابق">
+        {isRtl ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
       </button>
-      <button onClick={() => { resetAutoPlay(); next(); }} className="absolute top-1/2 -translate-y-1/2 -left-4 z-20 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-primary/5 hover:border-primary/40 hover:text-primary transition-all active:scale-90" aria-label="التالي">
-        <ChevronLeft className="w-5 h-5" />
+      <button onClick={() => { resetAutoPlay(); next(); }} className={`absolute top-1/2 -translate-y-1/2 ${isRtl ? '-left-4' : '-right-4'} z-20 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-primary/5 hover:border-primary/40 hover:text-primary transition-all active:scale-90`} aria-label="التالي">
+        {isRtl ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
       </button>
 
       <div className="flex justify-center gap-2.5 mt-2">

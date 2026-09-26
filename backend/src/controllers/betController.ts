@@ -2,104 +2,63 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import prisma from '../config/db';
 
+// Legacy bet placement - redirects to stream betting
 export const placeBet = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { matchId, selection, stake, useBonus } = req.body;
+    const { streamId, matchId, selection, stake, useBonus, charityOptionId } = req.body;
+    const targetStreamId = streamId || matchId;
 
-    if (stake <= 0) {
-      return res.status(400).json({ error: 'يجب أن يكون مبلغ الرهان أكبر من 0' });
-    }
+    if (!targetStreamId) return res.status(400).json({ error: 'streamId is required' });
+    if (stake <= 0) return res.status(400).json({ error: 'يجب أن يكون مبلغ الرهان أكبر من 0' });
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.isActive) {
-      return res.status(403).json({ error: 'عذراً، حسابك موقوف مؤقتاً. يرجى التواصل مع الدعم.' });
-    }
+    if (!user || !user.isActive) return res.status(403).json({ error: 'عذراً، حسابك موقوف مؤقتاً.' });
 
-    // Use a transaction to ensure atomic bet placement
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Validate user balance
       const wallet = await tx.wallet.findUnique({ where: { userId } });
       if (!wallet) throw new Error('لم يتم العثور على المحفظة');
 
       if (useBonus) {
-        if (wallet.bonusBalance < stake) {
-          throw new Error('رصيد البونص غير كافٍ');
-        }
+        if (wallet.bonusBalance < stake) throw new Error('رصيد البونص غير كافٍ');
       } else {
-        if (wallet.balance < stake) {
-          throw new Error('الرصيد غير كافٍ');
-        }
+        if (wallet.balance < stake) throw new Error('الرصيد غير كافٍ');
       }
 
-      // 2. Validate match status and start time
-      const match = await tx.match.findUnique({
-        where: { id: matchId },
+      const stream = await tx.stream.findUnique({
+        where: { id: targetStreamId },
         include: { odds: { where: { isActive: true } } }
       });
 
-      if (!match) throw new Error('المباراة غير موجودة');
-      // Uncomment or modify this if you want to allow live betting
-      if (match.status !== 'UPCOMING') throw new Error('تم إغلاق الرهان لهذه المباراة');
-      if (new Date(match.matchDate) <= new Date()) throw new Error('لقد بدأت المباراة بالفعل');
+      if (!stream) throw new Error('المباراة غير موجودة');
+      if (stream.streamType !== 'MATCH') throw new Error('الرهان متاح فقط للمباريات');
+      if (stream.status !== 'SCHEDULED') throw new Error('تم إغلاق الرهان لهذه المباراة');
 
-      // 3. Get odds
-      const currentOdds = match.odds[0];
+      const currentOdds = stream.odds[0];
       if (!currentOdds) throw new Error('الاحتمالات غير متوفرة حالياً');
 
       let oddsAtBet = 0;
       if (selection === 'TEAM_1_WIN') oddsAtBet = currentOdds.team1Win;
       else if (selection === 'DRAW') oddsAtBet = currentOdds.draw;
       else if (selection === 'TEAM_2_WIN') oddsAtBet = currentOdds.team2Win;
-
       if (oddsAtBet <= 1) throw new Error('احتمالات غير صالحة');
 
       const potentialPayout = stake * oddsAtBet;
 
-      // 4. Deduct stake and lock balance
       if (useBonus) {
-        await tx.wallet.update({
-          where: { userId },
-          data: {
-            bonusBalance: { decrement: stake },
-            lockedBonusBalance: { increment: stake }
-          }
-        });
+        await tx.wallet.update({ where: { userId }, data: { bonusBalance: { decrement: stake }, lockedBonusBalance: { increment: stake } } });
       } else {
-        await tx.wallet.update({
-          where: { userId },
-          data: {
-            balance: { decrement: stake },
-            lockedBalance: { increment: stake }
-          }
-        });
+        await tx.wallet.update({ where: { userId }, data: { balance: { decrement: stake }, lockedBalance: { increment: stake } } });
       }
 
-      // 5. Create transaction record
       await tx.walletTransaction.create({
-        data: {
-          userId,
-          type: 'BET_PLACED',
-          amount: -stake,
-          status: 'COMPLETED',
-          details: useBonus ? `Bonus bet placed on match ${matchId}` : `Bet placed on match ${matchId}`
-        }
+        data: { userId, type: 'BET_PLACED', amount: -stake, status: 'COMPLETED', details: `Bet placed on stream ${targetStreamId}` }
       });
 
-      // 6. Create immutable bet
       const bet = await tx.bet.create({
-        data: {
-          userId,
-          matchId,
-          selection,
-          stake,
-          oddsAtBet,
-          potentialPayout,
-          isBonus: useBonus || false,
-          status: 'PENDING'
-        }
+        data: { userId, streamId: targetStreamId, selection, stake, oddsAtBet, potentialPayout, isBonus: useBonus || false, status: 'PENDING', charityOptionId: charityOptionId || null }
       });
 
       return bet;
@@ -119,7 +78,8 @@ export const getUserBets = async (req: AuthRequest, res: Response) => {
     const bets = await prisma.bet.findMany({
       where: { userId },
       include: {
-        match: true
+        stream: { select: { title: true, team1Name: true, team2Name: true, status: true, streamType: true } },
+        charityVote: { include: { charity: { select: { name: true } } } }
       },
       orderBy: { createdAt: 'desc' }
     });

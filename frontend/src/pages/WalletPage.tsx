@@ -5,9 +5,11 @@ import api from '../api/axios';
 import { HeroSection } from '../components/ui/HeroSection';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { useTranslation } from 'react-i18next';
 
 const TransactionCard = ({ tx }: { tx: any }) => {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useTranslation();
   const isPositive = tx.type === 'DEPOSIT' || tx.type === 'BET_WON';
   
   return (
@@ -18,9 +20,9 @@ const TransactionCard = ({ tx }: { tx: any }) => {
              {isPositive ? '↓' : '↑'}
            </div>
            <div>
-              <p className="font-bold text-slate-800">
-                {tx.type === 'DEPOSIT' ? 'إيداع رصيد' : tx.type === 'WITHDRAWAL' ? 'سحب رصيد' : tx.type === 'BET_PLACED' ? 'رهان' : 'ربح رهان'}
-              </p>
+               <p className="font-bold text-slate-800">
+                 {tx.type === 'DEPOSIT' ? t('wallet.tx_deposit') : tx.type === 'WITHDRAWAL' ? t('wallet.tx_withdraw') : tx.type === 'BET_PLACED' ? t('wallet.tx_bet') : t('wallet.tx_won')}
+               </p>
               <p className="text-xs text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</p>
            </div>
          </div>
@@ -34,18 +36,18 @@ const TransactionCard = ({ tx }: { tx: any }) => {
        
        {expanded && (
          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 text-sm animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-medium">الحالة:</span>
-              <span className={`px-2 py-1 rounded-md text-xs font-bold ${tx.status === 'COMPLETED' ? 'bg-green-500/10 text-green-600' : tx.status === 'FAILED' ? 'bg-red-500/10 text-red-600' : 'bg-yellow-500/10 text-yellow-600'}`}>
-                {tx.status === 'COMPLETED' ? 'مكتمل' : tx.status === 'FAILED' ? 'فشل' : 'قيد المراجعة'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-medium">التاريخ والوقت:</span>
-              <span className="font-mono text-slate-700">{new Date(tx.createdAt).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-medium">رقم المعاملة:</span>
+             <div className="flex justify-between items-center">
+               <span className="text-slate-500 font-medium">{t('wallet.tx_status')}</span>
+               <span className={`px-2 py-1 rounded-md text-xs font-bold ${tx.status === 'COMPLETED' ? 'bg-green-500/10 text-green-600' : tx.status === 'FAILED' ? 'bg-red-500/10 text-red-600' : 'bg-yellow-500/10 text-yellow-600'}`}>
+                 {tx.status === 'COMPLETED' ? t('wallet.status_completed') : tx.status === 'FAILED' ? t('wallet.status_failed') : t('wallet.status_pending')}
+               </span>
+             </div>
+             <div className="flex justify-between items-center">
+               <span className="text-slate-500 font-medium">{t('wallet.tx_date')}</span>
+               <span className="font-mono text-slate-700">{new Date(tx.createdAt).toLocaleString()}</span>
+             </div>
+             <div className="flex justify-between items-center">
+               <span className="text-slate-500 font-medium">{t('wallet.tx_id')}</span>
               <span className="font-mono text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-md">{tx.id}</span>
             </div>
          </div>
@@ -55,6 +57,7 @@ const TransactionCard = ({ tx }: { tx: any }) => {
 };
 
 export const WalletPage: React.FC = () => {
+  const { t } = useTranslation();
   const [balance, setBalance] = useState(0.00);
   const [lockedBalance, setLockedBalance] = useState(0.00);
   const [bonusBalance, setBonusBalance] = useState(0.00);
@@ -114,7 +117,7 @@ export const WalletPage: React.FC = () => {
   const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmittingDeposit) return;
-    if (!receiptFile || !depositAmount) return toast.warning('الرجاء إدخال المبلغ ورفع صورة الإيصال');
+    if (!receiptFile || !depositAmount) return toast.warning(t('wallet.err_amount_receipt'));
     
     setIsSubmittingDeposit(true);
     const formData = new FormData();
@@ -126,13 +129,13 @@ export const WalletPage: React.FC = () => {
       await api.post('/wallet/deposit', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('تم إرسال طلب الإيداع بنجاح. سيتم مراجعته من قبل الإدارة.');
+      toast.success(t('wallet.deposit_success'));
       setShowDeposit(false);
       setDepositAmount('');
       setReceiptFile(null);
       fetchData();
     } catch (err) {
-      toast.error('حدث خطأ أثناء رفع الطلب');
+      toast.error(t('wallet.deposit_error'));
     } finally {
       setIsSubmittingDeposit(false);
     }
@@ -141,8 +144,8 @@ export const WalletPage: React.FC = () => {
   const handleWithdrawSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmittingWithdraw) return;
-    if (!withdrawAmount || !withdrawAddress) return toast.warning('الرجاء إدخال المبلغ وعنوان المحفظة');
-    if (Number(withdrawAmount) > balance) return toast.error('الرصيد غير كافٍ');
+    if (!withdrawAmount || !withdrawAddress) return toast.warning(t('wallet.err_amount_address'));
+    if (Number(withdrawAmount) > balance) return toast.error(t('wallet.err_insufficient'));
 
     setIsSubmittingWithdraw(true);
     try {
@@ -151,13 +154,13 @@ export const WalletPage: React.FC = () => {
         address: withdrawAddress,
         method: 'USDT TRC-20'
       });
-      toast.success('تم إرسال طلب السحب بنجاح. سيتم تحويل المبلغ قريباً.');
+      toast.success(t('wallet.withdraw_success'));
       setShowWithdraw(false);
       setWithdrawAmount('');
       setWithdrawAddress('');
       fetchData();
     } catch (err) {
-      toast.error('حدث خطأ أثناء إرسال الطلب');
+      toast.error(t('wallet.withdraw_error'));
     } finally {
       setIsSubmittingWithdraw(false);
     }
@@ -168,19 +171,19 @@ export const WalletPage: React.FC = () => {
       <HeroSection 
         title={
           <>
-            إدارة أموالك <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400">بسهولة</span>
+            {t('wallet.title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400">{t('wallet.title_highlight')}</span>
           </>
         }
-        subtitle="اشحن رصيدك أو اسحب أرباحك بسرعة البرق وبدون أي تعقيدات."
-        badge="أمان تام 🔒"
+        subtitle={t('wallet.subtitle')}
+        badge={t('wallet.badge')}
         minHeight="min-h-[40vh]"
       >
         <div className="mt-8 text-center p-6 inline-block min-w-[280px]">
-           <p className="text-sm font-bold text-slate-600 mb-1">الرصيد المتاح</p>
+           <p className="text-sm font-bold text-slate-600 mb-1">{t('wallet.available_balance')}</p>
            <h2 className="text-4xl font-black text-slate-900 drop-shadow-sm">${balance.toFixed(2)}</h2>
            <div className="flex gap-4 mt-6 justify-center w-full max-w-sm mx-auto">
-             <Button size="lg" className="flex-1 shadow-[0_0_15px_rgba(34,197,94,0.4)] text-lg" onClick={() => setShowDeposit(true)}>إيداع</Button>
-             <Button size="lg" variant="outline" className="flex-1 border-slate-300 bg-white/50 text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-lg" onClick={() => setShowWithdraw(true)}>سحب</Button>
+             <Button size="lg" className="flex-1 shadow-[0_0_15px_rgba(34,197,94,0.4)] text-lg" onClick={() => setShowDeposit(true)}>{t('wallet.deposit')}</Button>
+             <Button size="lg" variant="outline" className="flex-1 border-slate-300 bg-white/50 text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-lg" onClick={() => setShowWithdraw(true)}>{t('wallet.withdraw')}</Button>
            </div>
         </div>
       </HeroSection>
@@ -189,25 +192,25 @@ export const WalletPage: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
           <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-white/60 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-white/50 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-base text-slate-600 mb-2 relative z-10">معلق (رهانات)</h2>
+            <h2 className="text-sm md:text-base text-slate-600 mb-2 relative z-10">{t('wallet.locked_bets')}</h2>
             <div className="text-xl md:text-3xl font-bold text-slate-700 relative z-10">${lockedBalance.toFixed(2)}</div>
           </div>
           
           <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-green-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-green-50/60 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/15 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-base text-green-600 mb-2 relative z-10 font-bold">إجمالي الإيداعات</h2>
+            <h2 className="text-sm md:text-base text-green-600 mb-2 relative z-10 font-bold">{t('wallet.total_deposits')}</h2>
             <div className="text-xl md:text-3xl font-bold text-green-600 relative z-10">${totalDeposited.toFixed(2)}</div>
           </div>
 
           <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-red-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-red-50/60 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-red-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-base text-red-500 mb-2 relative z-10">إجمالي السحوبات</h2>
+            <h2 className="text-sm md:text-base text-red-500 mb-2 relative z-10">{t('wallet.total_withdrawals')}</h2>
             <div className="text-xl md:text-3xl font-bold text-red-600 relative z-10">${totalWithdrawn.toFixed(2)}</div>
           </div>
           
           <div className="bg-white/40 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-blue-300/50 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-blue-50/60 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/15 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-            <h2 className="text-sm md:text-base text-blue-600 mb-2 relative z-10 font-bold">رصيد البونص 🎁</h2>
+            <h2 className="text-sm md:text-base text-blue-600 mb-2 relative z-10 font-bold">{t('wallet.bonus_balance')}</h2>
             <div className="text-xl md:text-3xl font-bold text-blue-600 relative z-10">${bonusBalance.toFixed(2)}</div>
           </div>
         </div>
@@ -216,7 +219,7 @@ export const WalletPage: React.FC = () => {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-full animate-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-              <h3 className="text-xl font-bold text-primary">طلب إيداع</h3>
+              <h3 className="text-xl font-bold text-primary">{t('wallet.deposit_title')}</h3>
               <button onClick={() => setShowDeposit(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-500 hover:bg-slate-300 transition-colors">
                 ✕
               </button>
@@ -225,7 +228,7 @@ export const WalletPage: React.FC = () => {
               {depositMethods.length > 0 ? (
                 <div className="mb-6 space-y-4">
                   <div>
-                    <label className="block mb-2 text-sm font-bold text-slate-700">طريقة الإيداع</label>
+                    <label className="block mb-2 text-sm font-bold text-slate-700">{t('wallet.deposit_method')}</label>
                     <select 
                       value={depositMethod} 
                       onChange={e => setDepositMethod(e.target.value)}
@@ -239,29 +242,29 @@ export const WalletPage: React.FC = () => {
                   
                   {depositMethods.filter(m => m.name === depositMethod).map(method => (
                     <div key={method.id} className="bg-blue-50/50 p-4 rounded-xl font-mono text-sm border border-blue-100 animate-in fade-in">
-                      <p className="text-slate-500 mb-2 font-sans font-medium text-xs">عنوان المحفظة / الرابط:</p>
+                       <p className="text-slate-500 mb-2 font-sans font-medium text-xs">{t('wallet.wallet_address')}</p>
                       <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
                         <span className="truncate break-all text-slate-700 font-bold max-w-[70%]">{method.address}</span>
-                        <Button type="button" variant="outline" className="h-8 px-3 ml-2 bg-slate-50 hover:bg-slate-100 text-xs" onClick={() => {
+                         <Button type="button" variant="outline" className="h-8 px-3 ms-2 bg-slate-50 hover:bg-slate-100 text-xs" onClick={() => {
                           navigator.clipboard.writeText(method.address);
-                          toast.success('تم النسخ بنجاح');
-                        }}>نسخ</Button>
+                          toast.success(t('wallet.copied'));
+                        }}>{t('wallet.copy')}</Button>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="p-4 mb-6 text-center text-amber-600 bg-amber-50 rounded-xl border border-amber-200 text-sm font-medium">
-                  لا توجد طرق إيداع متاحة حالياً، يرجى التواصل مع الدعم.
+                 <div className="p-4 mb-6 text-center text-amber-600 bg-amber-50 rounded-xl border border-amber-200 text-sm font-medium">
+                  {t('wallet.no_methods')}
                 </div>
               )}
               <form onSubmit={handleDepositSubmit} className="space-y-5">
                 <div>
-                  <label className="block mb-2 text-sm font-bold text-slate-700">المبلغ (USD)</label>
+                  <label className="block mb-2 text-sm font-bold text-slate-700">{t('wallet.amount_usd')}</label>
                   <input type="number" required value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono text-lg" placeholder="0.00" />
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-bold text-slate-700">صورة إثبات التحويل (Screenshot)</label>
+                   <label className="block mb-2 text-sm font-bold text-slate-700">{t('wallet.receipt_label')}</label>
                   <input type="file" accept="image/*" required onChange={e => setReceiptFile(e.target.files?.[0] || null)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 outline-none focus:border-primary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all text-sm" />
                 </div>
                 <div className="pt-2">
@@ -269,10 +272,10 @@ export const WalletPage: React.FC = () => {
                     {isSubmittingDeposit ? (
                       <>
                         <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        جاري الإرسال...
+                        {t('wallet.sending')}
                       </>
                     ) : (
-                      'إرسال الطلب'
+                      t('wallet.submit')
                     )}
                   </Button>
                 </div>
@@ -286,7 +289,7 @@ export const WalletPage: React.FC = () => {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-full animate-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-              <h3 className="text-xl font-bold text-primary">طلب سحب</h3>
+              <h3 className="text-xl font-bold text-primary">{t('wallet.withdraw_title')}</h3>
               <button onClick={() => setShowWithdraw(false)} disabled={isSubmittingWithdraw} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-500 hover:bg-slate-300 transition-colors disabled:opacity-50">
                 ✕
               </button>
@@ -294,12 +297,12 @@ export const WalletPage: React.FC = () => {
             <div className="p-6 overflow-y-auto custom-scrollbar">
               <form onSubmit={handleWithdrawSubmit} className="space-y-5">
                 <div>
-                  <label className="block mb-2 text-sm font-bold text-slate-700">المبلغ (USD)</label>
+                   <label className="block mb-2 text-sm font-bold text-slate-700">{t('wallet.amount_usd')}</label>
                   <input type="number" max={balance} required value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} disabled={isSubmittingWithdraw} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono text-lg disabled:opacity-50" placeholder="0.00" />
-                  <span className="text-xs text-slate-500 mt-1.5 font-medium block">الحد الأقصى المتاح: <span className="font-bold text-slate-800">${balance.toFixed(2)}</span></span>
+                   <span className="text-xs text-slate-500 mt-1.5 font-medium block">{t('wallet.max_available')} <span className="font-bold text-slate-800">${balance.toFixed(2)}</span></span>
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-bold text-slate-700">عنوان محفظتك (USDT TRC-20)</label>
+                   <label className="block mb-2 text-sm font-bold text-slate-700">{t('wallet.withdraw_address_label')}</label>
                   <input type="text" required value={withdrawAddress} onChange={e => setWithdrawAddress(e.target.value)} disabled={isSubmittingWithdraw} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono disabled:opacity-50" placeholder="T..." />
                 </div>
                 <div className="pt-2">
@@ -307,10 +310,10 @@ export const WalletPage: React.FC = () => {
                     {isSubmittingWithdraw ? (
                       <>
                         <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        جاري الإرسال...
+                        {t('wallet.sending')}
                       </>
                     ) : (
-                      'تأكيد السحب'
+                      t('wallet.confirm_withdraw')
                     )}
                   </Button>
                 </div>
@@ -320,12 +323,12 @@ export const WalletPage: React.FC = () => {
         </div>
       , document.body)}
 
-      <h2 className="text-2xl font-bold mb-6">سجل المعاملات</h2>
+      <h2 className="text-2xl font-bold mb-6">{t('wallet.transactions_title')}</h2>
       <div className="space-y-3 mb-8">
         {isLoading ? (
-          <div className="p-8 text-center text-muted-foreground glass rounded-xl">جاري التحميل...</div>
+          <div className="p-8 text-center text-muted-foreground glass rounded-xl">{t('common.loading')}</div>
         ) : transactions.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground glass rounded-xl">لا توجد معاملات سابقة.</div>
+          <div className="p-8 text-center text-muted-foreground glass rounded-xl">{t('wallet.no_transactions')}</div>
         ) : (
           transactions.map(tx => (
             <TransactionCard key={tx.id} tx={tx} />

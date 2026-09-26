@@ -7,8 +7,10 @@ import { BetSlip } from '../components/BetSlip';
 import api from '../api/axios';
 import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 export const MatchDetailsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -44,7 +46,7 @@ export const MatchDetailsPage: React.FC = () => {
         }
       } catch (error) {
         if (isMounted) {
-          toast.showToast('فشل تحميل بيانات المباراة', 'error');
+          toast.showToast(t('match_details.fetch_error', 'فشل تحميل بيانات المباراة'), 'error');
           setLoading(false);
         }
       }
@@ -71,8 +73,8 @@ export const MatchDetailsPage: React.FC = () => {
   if (!match) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">المباراة غير موجودة</h2>
-        <Button onClick={() => navigate('/matches')}>العودة للمباريات</Button>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('match_details.not_found', 'المباراة غير موجودة')}</h2>
+        <Button onClick={() => navigate('/matches')}>{t('match_details.back', 'العودة للمباريات')}</Button>
       </div>
     );
   }
@@ -92,7 +94,7 @@ export const MatchDetailsPage: React.FC = () => {
             onClick={() => navigate('/matches')}
             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm font-bold"
           >
-            <ChevronRight size={16} /> العودة للمباريات
+            <ChevronRight size={16} /> {t('match_details.back', 'العودة للمباريات')}
           </button>
 
           <div className="flex flex-col items-center">
@@ -129,7 +131,7 @@ export const MatchDetailsPage: React.FC = () => {
                     {match.status === 'LIVE' && (
                       <span className="flex items-center gap-2 text-sm text-red-400 font-bold mt-4 bg-red-500/10 border border-red-500/20 px-4 py-1.5 rounded-full">
                         <Activity size={14} className="animate-pulse" />
-                        {match.liveUpdate || 'مباشر'}
+                        {match.liveUpdate || t('match_details.live', 'مباشر')}
                       </span>
                     )}
                   </div>
@@ -165,19 +167,19 @@ export const MatchDetailsPage: React.FC = () => {
               onClick={() => setActiveTab('BETTING')}
               className={`flex-1 py-4 text-sm font-bold transition-colors border-b-2 ${activeTab === 'BETTING' ? 'border-primary text-primary bg-white' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'}`}
             >
-              المراهنة
+              {t('match_details.tab_betting', 'المراهنة')}
             </button>
             <button 
               onClick={() => setActiveTab('LINEUPS')}
               className={`flex-1 py-4 text-sm font-bold transition-colors border-b-2 ${activeTab === 'LINEUPS' ? 'border-primary text-primary bg-white' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'}`}
             >
-              التشكيلة
+              {t('match_details.tab_lineups', 'التشكيلة')}
             </button>
             <button 
               onClick={() => setActiveTab('STATS')}
               className={`flex-1 py-4 text-sm font-bold transition-colors border-b-2 ${activeTab === 'STATS' ? 'border-primary text-primary bg-white' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'}`}
             >
-              الإحصائيات
+              {t('match_details.tab_stats', 'الإحصائيات')}
             </button>
           </div>
 
@@ -188,34 +190,34 @@ export const MatchDetailsPage: React.FC = () => {
                 {match.status !== 'UPCOMING' ? (
                   <div className="bg-red-50 text-red-600 p-8 rounded-2xl text-center border border-red-100 flex flex-col items-center">
                     <LockKeyhole size={48} className="mb-4 opacity-50" />
-                    <h3 className="text-xl font-bold mb-2">أُغلق باب المراهنة</h3>
-                    <p className="text-red-500/80">المباراة جارية أو انتهت، لا يمكن وضع رهانات جديدة.</p>
+                    <h3 className="text-xl font-bold mb-2">{t('match_details.betting_closed', 'أُغلق باب المراهنة')}</h3>
+                    <p className="text-red-500/80">{t('match_details.betting_closed_sub', 'المباراة جارية أو انتهت، لا يمكن وضع رهانات جديدة.')}</p>
                   </div>
                 ) : (
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-6 text-center">اختر توقعك للمباراة</h3>
+                    <h3 className="text-lg font-bold text-slate-800 mb-6 text-center">{t('match_details.choose_prediction', 'اختر توقعك للمباراة')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <button 
-                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: 'فوز ' + match.team1Name, selectionValue: 'TEAM_1_WIN', odds: match.odds?.[0]?.team1Win || 1.5 })}
+                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: t('matches.win_1', 'فوز') + ' ' + match.team1Name, selectionValue: 'TEAM_1_WIN', odds: match.odds?.[0]?.team1Win || 1.5 })}
                         className="bg-white border-2 border-slate-100 hover:border-primary rounded-2xl p-6 flex flex-col items-center transition-all hover:shadow-lg hover:shadow-primary/10 group"
                       >
-                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">فوز {match.team1Name}</span>
+                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">{t('matches.win_1', 'فوز')} {match.team1Name}</span>
                         <span className="text-3xl font-black text-primary">{match.odds?.[0]?.team1Win || '-'}</span>
                       </button>
                       
                       <button 
-                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: 'تعادل', selectionValue: 'DRAW', odds: match.odds?.[0]?.draw || 3.0 })}
+                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: t('matches.draw', 'تعادل'), selectionValue: 'DRAW', odds: match.odds?.[0]?.draw || 3.0 })}
                         className="bg-white border-2 border-slate-100 hover:border-amber-500 rounded-2xl p-6 flex flex-col items-center transition-all hover:shadow-lg hover:shadow-amber-500/10 group"
                       >
-                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">تعادل</span>
+                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">{t('matches.draw', 'تعادل')}</span>
                         <span className="text-3xl font-black text-amber-500">{match.odds?.[0]?.draw || '-'}</span>
                       </button>
                       
                       <button 
-                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: 'فوز ' + match.team2Name, selectionValue: 'TEAM_2_WIN', odds: match.odds?.[0]?.team2Win || 2.5 })}
+                        onClick={() => setSelectedBet({ matchId: match.id, team1: match.team1Name, team2: match.team2Name, selectionLabel: t('matches.win_2', 'فوز') + ' ' + match.team2Name, selectionValue: 'TEAM_2_WIN', odds: match.odds?.[0]?.team2Win || 2.5 })}
                         className="bg-white border-2 border-slate-100 hover:border-blue-500 rounded-2xl p-6 flex flex-col items-center transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
                       >
-                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">فوز {match.team2Name}</span>
+                        <span className="text-slate-500 text-sm font-bold mb-2 group-hover:text-slate-700">{t('matches.win_2', 'فوز')} {match.team2Name}</span>
                         <span className="text-3xl font-black text-blue-500">{match.odds?.[0]?.team2Win || '-'}</span>
                       </button>
                     </div>
@@ -229,8 +231,8 @@ export const MatchDetailsPage: React.FC = () => {
                 {!apiDetails?.lineups || apiDetails.lineups.length === 0 ? (
                   <div className="text-center p-12 bg-slate-50 rounded-2xl border border-slate-100">
                     <AlertCircle size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-700 mb-2">التشكيلات غير متوفرة بعد</h3>
-                    <p className="text-slate-500">عادة ما يتم الإعلان عن التشكيلات قبل ساعة من بداية المباراة.</p>
+                    <h3 className="text-xl font-bold text-slate-700 mb-2">{t('match_details.lineups_not_available', 'التشكيلات غير متوفرة بعد')}</h3>
+                    <p className="text-slate-500">{t('match_details.lineups_not_available_sub', 'عادة ما يتم الإعلان عن التشكيلات قبل ساعة من بداية المباراة.')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -240,11 +242,11 @@ export const MatchDetailsPage: React.FC = () => {
                         <img src={apiDetails.lineups[0].team.logo} alt="home" className="w-12 h-12" />
                         <div>
                           <h4 className="font-bold text-lg">{apiDetails.lineups[0].team.name}</h4>
-                          <span className="text-sm font-bold text-slate-500">خطة: {apiDetails.lineups[0].formation}</span>
+                          <span className="text-sm font-bold text-slate-500">{t('match_details.formation', 'خطة:')} {apiDetails.lineups[0].formation}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <h5 className="font-bold text-slate-700 mb-3">التشكيلة الأساسية</h5>
+                        <h5 className="font-bold text-slate-700 mb-3">{t('match_details.starting_xi', 'التشكيلة الأساسية')}</h5>
                         {apiDetails.lineups[0].startXI.map((player: any, idx: number) => (
                           <div key={idx} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-100">
                             <span className="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-lg text-xs font-bold text-slate-600">{player.player.number}</span>
@@ -260,11 +262,11 @@ export const MatchDetailsPage: React.FC = () => {
                         <img src={apiDetails.lineups[1].team.logo} alt="away" className="w-12 h-12" />
                         <div>
                           <h4 className="font-bold text-lg">{apiDetails.lineups[1].team.name}</h4>
-                          <span className="text-sm font-bold text-slate-500">خطة: {apiDetails.lineups[1].formation}</span>
+                          <span className="text-sm font-bold text-slate-500">{t('match_details.formation', 'خطة:')} {apiDetails.lineups[1].formation}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <h5 className="font-bold text-slate-700 mb-3">التشكيلة الأساسية</h5>
+                        <h5 className="font-bold text-slate-700 mb-3">{t('match_details.starting_xi', 'التشكيلة الأساسية')}</h5>
                         {apiDetails.lineups[1].startXI.map((player: any, idx: number) => (
                           <div key={idx} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-100">
                             <span className="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-lg text-xs font-bold text-slate-600">{player.player.number}</span>
@@ -283,8 +285,8 @@ export const MatchDetailsPage: React.FC = () => {
                 {!apiDetails?.statistics || apiDetails.statistics.length === 0 ? (
                   <div className="text-center p-12 bg-slate-50 rounded-2xl border border-slate-100">
                     <Activity size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-700 mb-2">لا توجد إحصائيات متاحة حالياً</h3>
-                    <p className="text-slate-500">تبدأ الإحصائيات بالظهور عند بداية المباراة.</p>
+                    <h3 className="text-xl font-bold text-slate-700 mb-2">{t('match_details.stats_not_available', 'لا توجد إحصائيات متاحة حالياً')}</h3>
+                    <p className="text-slate-500">{t('match_details.stats_not_available_sub', 'تبدأ الإحصائيات بالظهور عند بداية المباراة.')}</p>
                   </div>
                 ) : (
                   <div className="space-y-6">

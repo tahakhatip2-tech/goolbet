@@ -3,13 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import authRoutes from './routes/authRoutes';
-import matchRoutes from './routes/matchRoutes';
-import betRoutes from './routes/betRoutes';
+import streamRoutes from './routes/streamRoutes';
+import academyRoutes from './routes/academyRoutes';
+import charityRoutes from './routes/charityRoutes';
 import adminRoutes from './routes/adminRoutes';
 import walletRoutes from './routes/walletRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import chatRoutes from './routes/chatRoutes';
-import apiFootballRoutes from './routes/apiFootballRoutes';
+import tournamentRoutes from './routes/tournamentRoutes';
 
 dotenv.config();
 
@@ -17,30 +18,32 @@ const app = express();
 
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 app.use(express.json());
 
-// Serve uploads directory (only in local/non-serverless environments)
-// In Vercel, static files are served from /tmp and don't persist between requests
+// Serve local uploads (dev only)
 if (!process.env.VERCEL) {
-  // Works for both ts-node (src/) and compiled (dist/src/) contexts
   const uploadsPath = path.join(process.cwd(), 'uploads');
   app.use('/uploads', express.static(uploadsPath));
 }
 
+// ─── Routes ───────────────────────────────────────────────────────────────────
+
 app.use('/api/auth', authRoutes);
-app.use('/api/matches', matchRoutes);
-app.use('/api/bets', betRoutes);
+app.use('/api/streams', streamRoutes);
+app.use('/api/academies', academyRoutes);
+app.use('/api/charities', charityRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/admin/api-football', apiFootballRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/tournaments', tournamentRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'API is running', env: process.env.NODE_ENV });
+// Health check
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', message: 'Academy SaaS API is running 🚀', env: process.env.NODE_ENV });
 });
 
 export default app;

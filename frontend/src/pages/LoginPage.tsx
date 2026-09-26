@@ -85,7 +85,17 @@ export const LoginPage: React.FC = () => {
       }
 
       toast.success('تم تسجيل الدخول بنجاح');
-      navigate('/');
+      
+      // Redirect based on role
+      const userRole = (await login({ email: formattedEmail, password })).user?.role;
+      if (userRole === 'ACADEMY') {
+        navigate('/academy');
+      } else if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+
     } catch (err: any) {
       console.error('Login error:', err);
       let errorMessage = 'حدث خطأ، حاول مرة أخرى';
@@ -114,9 +124,9 @@ export const LoginPage: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-[#0f172a]/90 z-0"></div>
 
       {/* Back button */}
-      <Link to="/" className="absolute top-4 right-4 z-20 flex items-center gap-1.5 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10">
+      <Link to="/" className="absolute top-4 start-4 z-20 flex items-center gap-1.5 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10">
         <ArrowRight size={16} />
-        <span className="text-xs font-medium">الرئيسية</span>
+        <span className="text-xs font-medium">{t('nav.home')}</span>
       </Link>
 
       {/* Glassmorphic Modal taking full possible space compressed */}
@@ -130,14 +140,14 @@ export const LoginPage: React.FC = () => {
           <h1 className="text-xl sm:text-2xl font-black tracking-wide leading-none bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,197,94,0.4)] pb-0.5">
             Goolbet
           </h1>
-          <p className="text-white/70 text-[9px] sm:text-[10px] mt-0.5 font-medium tracking-wide">المنصة الأولى للمراهنات</p>
+          <p className="text-white/70 text-[9px] sm:text-[10px] mt-0.5 font-medium tracking-wide">{t('auth.login_subtitle')}</p>
         </div>
 
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-3 sm:p-5 rounded-2xl sm:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col justify-center w-full overflow-hidden">
           
           <div className="text-center mb-2 sm:mb-3">
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-0.5">تسجيل الدخول</h2>
-            <p className="text-white/50 text-[10px] sm:text-xs">أدخل بياناتك للوصول إلى حسابك</p>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-0.5">{t('auth.login_title')}</h2>
+            <p className="text-white/50 text-[10px] sm:text-xs">{t('auth.login_subtitle')}</p>
           </div>
           
           {error && (
@@ -149,7 +159,7 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-2">
             <div className="space-y-0.5">
-              <label className="block text-[10px] sm:text-xs font-medium text-white/80">البريد الإلكتروني أو اسم المستخدم</label>
+              <label className="block text-[10px] sm:text-xs font-medium text-white/80">{t('auth.email')}</label>
               <div className="relative">
                 <input 
                   type="text" 
@@ -163,7 +173,7 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div className="space-y-0.5">
-              <label className="block text-[10px] sm:text-xs font-medium text-white/80">كلمة المرور</label>
+              <label className="block text-[10px] sm:text-xs font-medium text-white/80">{t('auth.password')}</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
@@ -192,20 +202,20 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="rounded border-white/20 bg-white/5 text-primary focus:ring-primary w-3 h-3 transition-colors" 
                 />
-                <span className="text-[10px] sm:text-xs text-white/60 group-hover:text-white transition-colors">تذكرني</span>
+                <span className="text-[10px] sm:text-xs text-white/60 group-hover:text-white transition-colors">{t('auth.remember_me', 'تذكرني')}</span>
               </label>
-              <a href="#" className="text-[10px] sm:text-xs font-medium text-primary hover:text-primary/80 transition-colors">نسيت كلمة المرور؟</a>
+              <a href="#" className="text-[10px] sm:text-xs font-medium text-primary hover:text-primary/80 transition-colors">{t('auth.forgot_password')}</a>
             </div>
             
             <Button className="w-full h-8 sm:h-9 text-xs sm:text-sm font-bold shadow-[0_0_10px_rgba(34,197,94,0.3)] hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] mt-1 transition-all active:scale-[0.98]" type="submit" disabled={isLoading}>
-              {isLoading ? 'جاري الدخول...' : 'تسجيل الدخول'}
-              {!isLoading && <ArrowLeft className="mr-1.5" size={14} />}
+              {isLoading ? t('auth.logging_in') : t('auth.login_btn')}
+              {!isLoading && <ArrowLeft className="ms-1.5" size={14} />}
             </Button>
           </form>
 
           <div className="relative flex items-center justify-center my-2 sm:my-3">
             <div className="border-t border-white/10 w-full absolute"></div>
-            <div className="bg-[#1a2233] px-2 relative text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider rounded-full py-0.5 border border-white/5">أو الدخول بواسطة</div>
+            <div className="bg-[#1a2233] px-2 relative text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider rounded-full py-0.5 border border-white/5">{t('auth.or')}</div>
           </div>
 
           <div className="space-y-1">
@@ -218,7 +228,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <p className="text-center text-[10px] sm:text-xs text-white/60 mt-2 sm:mt-3">
-            ليس لديك حساب؟ <Link to="/register" className="font-bold text-primary hover:text-white transition-all">إنشاء حساب</Link>
+            {t('auth.no_account')} <Link to="/register" className="font-bold text-primary hover:text-white transition-all">{t('auth.register_link')}</Link>
           </p>
         </div>
         

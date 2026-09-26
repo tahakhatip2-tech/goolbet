@@ -8,7 +8,7 @@ import { HeroSection } from '../components/ui/HeroSection';
 import { FeaturesSlider } from '../components/FeaturesSlider';
 
 export const HomePage: React.FC = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [featuredMatches, setFeaturedMatches] = useState<any[]>([]);
   const [isLoadingMatches, setIsLoadingMatches] = useState(true);
@@ -37,16 +37,16 @@ export const HomePage: React.FC = () => {
       <HeroSection 
         title={
           <>
-            توقع. راهن. <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-500">اربح</span>
+            {t('home.hero_title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-500">{t('home.hero_title_highlight')}</span>
           </>
         }
-        subtitle="المنصة الأولى للمراهنات الرياضية. استمتع بأفضل الاحتمالات وأسرع عمليات السحب والإيداع."
-        badge="Goolbet عالم"
+        subtitle={t('home.hero_subtitle')}
+        badge={t('home.hero_badge')}
         minHeight="min-h-[40vh]"
       >
         <div className="flex flex-col sm:flex-row gap-4 mt-8 justify-center items-center w-full max-w-md mx-auto">
           <Button size="lg" className="w-full sm:w-auto shadow-[0_0_15px_rgba(34,197,94,0.4)] text-lg px-8" onClick={() => navigate('/matches')}>
-            ابدأ المراهنة الآن
+            {t('home.start_betting')}
           </Button>
         </div>
       </HeroSection>
@@ -62,12 +62,12 @@ export const HomePage: React.FC = () => {
       <section className="py-2 relative z-10">
         <div className="container mx-auto px-2">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-2 gap-1">
-            <div className="text-center md:text-right">
-              <h2 className="text-xl md:text-2xl font-bold mb-0.5 text-slate-900">أبرز المباريات القادمة</h2>
-              <p className="text-slate-600 text-xs md:text-sm">لا تفوت فرصة الرهان على أقوى المواجهات الكروية.</p>
+            <div className="text-center md:text-start">
+              <h2 className="text-xl md:text-2xl font-bold mb-0.5 text-slate-900">{t('home.featured_matches')}</h2>
+              <p className="text-slate-600 text-xs md:text-sm">{t('home.featured_matches_sub')}</p>
             </div>
             <Link to="/matches" className="text-primary hover:text-primary/80 font-bold flex items-center justify-center gap-1 group transition-colors text-sm bg-primary/10 px-4 py-2 rounded-full md:bg-transparent md:px-0 md:py-0">
-              عرض الكل
+              {t('home.view_all')}
               {isRtl ? <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
             </Link>
           </div>
@@ -77,7 +77,7 @@ export const HomePage: React.FC = () => {
               <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : featuredMatches.length === 0 ? (
-            <div className="bg-white p-12 text-center rounded-2xl shadow-sm border border-slate-200 text-slate-500 font-medium">لا توجد مباريات بارزة حالياً.</div>
+            <div className="bg-white p-12 text-center rounded-2xl shadow-sm border border-slate-200 text-slate-500 font-medium">{t('home.no_featured')}</div>
           ) : (
             <div className="grid lg:grid-cols-3 gap-2">
               {featuredMatches.map(match => (
@@ -113,7 +113,7 @@ export const HomePage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <Button className="w-full h-8 bg-primary text-slate-900 hover:bg-primary/90 text-xs font-bold rounded-lg shadow-none" onClick={() => navigate('/matches')}>راهن الآن</Button>
+                  <Button className="w-full h-8 bg-primary text-slate-900 hover:bg-primary/90 text-xs font-bold rounded-lg shadow-none" onClick={() => navigate('/matches')}>{t('home.bet_now')}</Button>
                 </div>
               ))}
             </div>

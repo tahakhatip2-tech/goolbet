@@ -30,7 +30,132 @@ model User {
   wallet           Wallet?
   transactions     WalletTransaction[]
   withdrawals      Withdrawal[]
-  comments         MatchComment[]
+  comments         StreamComment[]
+  charityVotes     CharityVote[]
+  academy          Academy?
+}
+
+model Academy {
+  id           String         @id @default(uuid())
+  userId       String         @unique
+  name         String
+  logo         String?
+  coverImage   String?
+  description  String?
+  city         String?
+  country      String?
+  phone        String?
+  website      String?
+  isVerified   Boolean        @default(false)
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streams      Stream[]
+  tournaments  Tournament[]   @relation("TournamentOrganizer")
+  teamEntries  TournamentTeam[] @relation("AcademyTeams")
+}
+
+model Stream {
+  id           String        @id @default(uuid())
+  academyId    String
+  title        String
+  description  String?
+  streamType   StreamType    @default(MATCH)
+  status       StreamStatus  @default(DRAFT)
+  streamUrl    String?
+  thumbnailUrl String?
+  scheduledAt  DateTime?
+  startedAt    DateTime?
+  endedAt      DateTime?
+  isStreamActive Boolean     @default(false)
+  liveUpdate   String?
+  matchPhase   String?
+
+  // Match-specific fields
+  team1Name      String?
+  team1Logo      String?
+  team2Name      String?
+  team2Logo      String?
+  team1Score     Int           @default(0)
+  team2Score     Int           @default(0)
+  extraTimeTeam1 Int           @default(0)
+  extraTimeTeam2 Int           @default(0)
+  penaltiesTeam1 Int           @default(0)
+  penaltiesTeam2 Int           @default(0)
+  isKnockout     Boolean       @default(false)
+  result         BetSelection?
+  resultAt90     BetSelection?
+
+  // Podcast-specific fields
+  hostName     String?
+  guestNames   String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  academy      Academy       @relation(fields: [academyId], references: [id], onDelete: Cascade)
+  bets         Bet[]
+  odds         Odds[]
+  settlements  Settlement[]
+  comments     StreamComment[]
+  charityPool  CharityPool?
+  tournamentMatch TournamentMatch?
+
+  // Keep legacy match relation for migration compatibility
+  apiFixtureId Int?          @unique
+}
+
+model Charity {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  logo        String?
+  isActive    Boolean         @default(true)
+  totalReceived Float         @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  options     CharityOption[]
+  votes       CharityVote[]
+}
+
+model CharityPool {
+  id         String          @id @default(uuid())
+  streamId   String          @unique
+  totalPool  Float           @default(0)
+  status     PoolStatus      @default(ACTIVE)
+  resolvedAt DateTime?
+  createdAt  DateTime        @default(now())
+  stream     Stream          @relation(fields: [streamId], references: [id], onDelete: Cascade)
+  options    CharityOption[]
+  votes      CharityVote[]
+}
+
+model CharityOption {
+  id         String      @id @default(uuid())
+  poolId     String
+  charityId  String
+  totalVotes Float       @default(0)
+  createdAt  DateTime    @default(now())
+  pool       CharityPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  charity    Charity     @relation(fields: [charityId], references: [id])
+  votes      CharityVote[]
+}
+
+model CharityVote {
+  id              String        @id @default(uuid())
+  poolId          String
+  userId          String
+  charityId       String
+  charityOptionId String
+  betId           String        @unique
+  amount          Float         @default(0)
+  isPaid          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  pool            CharityPool   @relation(fields: [poolId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+  charity         Charity       @relation(fields: [charityId], references: [id])
+  charityOption   CharityOption @relation(fields: [charityOptionId], references: [id])
+  bet             Bet           @relation(fields: [betId], references: [id])
 }
 
 model Notification {
@@ -59,55 +184,21 @@ model Wallet {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Match {
-  id             String        @id @default(uuid())
-  team1Name      String
-  team1Logo      String?
-  team2Name      String
-  team2Logo      String?
-  league         String
-  matchDate      DateTime
-  status         MatchStatus   @default(DRAFT)
-  description    String?
-  result         BetSelection?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  team1Score     Int           @default(0)
-  team2Score     Int           @default(0)
-  endedAt        DateTime?
-  extraTimeTeam1 Int           @default(0)
-  extraTimeTeam2 Int           @default(0)
-  isKnockout     Boolean       @default(false)
-  liveUpdate     String?
-  matchPhase     String?
-  penaltiesTeam1 Int           @default(0)
-  penaltiesTeam2 Int           @default(0)
-  resultAt90     BetSelection?
-  startedAt      DateTime?
-  streamUrl      String?
-  isStreamActive Boolean       @default(false)
-  apiFixtureId   Int?          @unique
-  bets           Bet[]
-  odds           Odds[]
-  settlements    Settlement[]
-  comments       MatchComment[]
-}
-
 model Odds {
   id        String   @id @default(uuid())
-  matchId   String
+  streamId  String
   team1Win  Float
   draw      Float
   team2Win  Float
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
 }
 
 model Bet {
   id              String       @id @default(uuid())
   userId          String
-  matchId         String
+  streamId        String
   selection       BetSelection
   stake           Float
   oddsAtBet       Float
@@ -116,9 +207,11 @@ model Bet {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   isBonus         Boolean      @default(false)
-  match           Match        @relation(fields: [matchId], references: [id])
+  charityOptionId String?
+  stream          Stream       @relation(fields: [streamId], references: [id])
   user            User         @relation(fields: [userId], references: [id])
   settlement      Settlement?
+  charityVote     CharityVote?
 }
 
 model WalletTransaction {
@@ -166,22 +259,22 @@ model Withdrawal {
 
 model Settlement {
   id        String   @id @default(uuid())
-  matchId   String
+  streamId  String
   betId     String   @unique
   amount    Float
   isWin     Boolean
   createdAt DateTime @default(now())
   bet       Bet      @relation(fields: [betId], references: [id])
-  match     Match    @relation(fields: [matchId], references: [id])
+  stream    Stream   @relation(fields: [streamId], references: [id])
 }
 
-model MatchComment {
+model StreamComment {
   id        String   @id @default(uuid())
-  matchId   String
+  streamId  String
   userId    String
   message   String
   createdAt DateTime @default(now())
-  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -213,20 +306,136 @@ model League {
   updatedAt DateTime @updatedAt
 }
 
+// ─── Tournament Models ───────────────────────────────────────────────────────
+
+model Tournament {
+  id                   String             @id @default(uuid())
+  organizerAcademyId   String
+  name                 String
+  description          String?
+  logo                 String?
+  coverImage           String?
+  sport                String             @default("FOOTBALL")
+  format               TournamentFormat   @default(KNOCKOUT)
+  status               TournamentStatus   @default(DRAFT)
+  minTeams             Int                @default(2)
+  maxTeams             Int                @default(8)
+  registrationDeadline DateTime?
+  startDate            DateTime?
+  endDate              DateTime?
+  prizeInfo            String?
+  entryFee             Float              @default(0)
+  isPublic             Boolean            @default(true)
+  city                 String?
+  country              String?
+  venue                String?
+  drawGeneratedAt      DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  organizer            Academy            @relation("TournamentOrganizer", fields: [organizerAcademyId], references: [id], onDelete: Cascade)
+  teams                TournamentTeam[]
+  matches              TournamentMatch[]
+  standings            TournamentStanding[]
+}
+
+model TournamentTeam {
+  id           String               @id @default(uuid())
+  tournamentId String
+  academyId    String?
+  teamName     String
+  teamLogo     String?
+  status       TeamRegistrationStatus @default(PENDING)
+  registeredAt DateTime             @default(now())
+  tournament   Tournament           @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  academy      Academy?             @relation("AcademyTeams", fields: [academyId], references: [id], onDelete: SetNull)
+  players      TournamentPlayer[]
+  homeMatches  TournamentMatch[]    @relation("HomeTeam")
+  awayMatches  TournamentMatch[]    @relation("AwayTeam")
+  standings    TournamentStanding[]
+  winnerMatches TournamentMatch[]   @relation("MatchWinner")
+}
+
+model TournamentPlayer {
+  id           String          @id @default(uuid())
+  teamId       String
+  name         String
+  position     String?
+  jerseyNumber Int?
+  photoUrl     String?
+  createdAt    DateTime        @default(now())
+  team         TournamentTeam  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model TournamentMatch {
+  id           String             @id @default(uuid())
+  tournamentId String
+  homeTeamId   String
+  awayTeamId   String
+  round        String
+  groupName    String?
+  scheduledAt  DateTime?
+  streamId     String?            @unique
+  homeScore    Int                @default(0)
+  awayScore    Int                @default(0)
+  status       TournamentMatchStatus @default(SCHEDULED)
+  winnerId     String?
+  notes        String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  tournament   Tournament         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  homeTeam     TournamentTeam     @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam     TournamentTeam     @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  stream       Stream?            @relation(fields: [streamId], references: [id], onDelete: SetNull)
+  winner       TournamentTeam?    @relation("MatchWinner", fields: [winnerId], references: [id])
+}
+
+model TournamentStanding {
+  id             String         @id @default(uuid())
+  tournamentId   String
+  teamId         String
+  groupName      String?
+  played         Int            @default(0)
+  won            Int            @default(0)
+  drawn          Int            @default(0)
+  lost           Int            @default(0)
+  goalsFor       Int            @default(0)
+  goalsAgainst   Int            @default(0)
+  goalDifference Int            @default(0)
+  points         Int            @default(0)
+  updatedAt      DateTime       @updatedAt
+  tournament     Tournament     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team           TournamentTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, teamId])
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
 enum Role {
   USER
+  ACADEMY
   ADMIN
   SUPER_ADMIN
 }
 
-enum MatchStatus {
+enum StreamType {
+  MATCH
+  TRAINING
+  PODCAST
+}
+
+enum StreamStatus {
   DRAFT
-  UPCOMING
+  SCHEDULED
   LIVE
-  FINISHED
+  ENDED
   CANCELLED
-  EXTRA_TIME
-  PENALTIES
+}
+
+enum PoolStatus {
+  ACTIVE
+  RESOLVED
+  CANCELLED
 }
 
 enum BetSelection {
@@ -249,6 +458,7 @@ enum TransactionType {
   BET_PLACED
   BET_WON
   ADJUSTMENT
+  CHARITY_DONATION
 }
 
 enum TransactionStatus {
@@ -257,4 +467,31 @@ enum TransactionStatus {
   REJECTED
   COMPLETED
   FAILED
+}
+
+enum TournamentFormat {
+  LEAGUE
+  KNOCKOUT
+  GROUP_KNOCKOUT
+}
+
+enum TournamentStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TeamRegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TournamentMatchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
 }
